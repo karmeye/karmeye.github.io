@@ -458,7 +458,7 @@ http://stackoverflow.com/questions/7542480/what-are-the-common-use-cases-for-iph
       </item>
     
       <item>
-        <title>Class Names</title>
+        <title>Class Name Suffixes</title>
         <description>&lt;p&gt;Class names suffixes used in Apples obj-c frameworks.&lt;/p&gt;
 
 &lt;hr /&gt;
@@ -533,8 +533,8 @@ http://stackoverflow.com/questions/7542480/what-are-the-common-use-cases-for-iph
 &lt;!-- http://filippobiga.com/static/SpringBoard_8.0_hierarchy.svg --&gt;
 </description>
         <pubDate>Fri, 03 Oct 2014 00:00:00 +0300</pubDate>
-        <link>http://karmeye.com/class-names/</link>
-        <guid isPermaLink="true">http://karmeye.com/class-names/</guid>
+        <link>http://karmeye.com/class-name-suffixes/</link>
+        <guid isPermaLink="true">http://karmeye.com/class-name-suffixes/</guid>
       </item>
     
   </channel>
