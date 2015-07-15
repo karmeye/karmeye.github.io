@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>iOS8, Popovers & PassthroughViews &#8211; Karmeye</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Getting passthroughViews to work on iOS8 when presenting a popover from a UIBarButton.">
+    <meta name="author" content="">
+    <meta name="keywords" content="">
+    <link rel="canonical" href="http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/">
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed for Karmeye" href="/feed.xml" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/pixyll.css?201507151517" type="text/css">
+
+    <!-- Fonts -->
+    <link href='//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Lato:900,300' rel='stylesheet' type='text/css'>
+    
+
+
+    <!-- Open Graph -->
+    <!-- From: https://github.com/mmistakes/hpstr-jekyll-theme/blob/master/_includes/head.html -->
+    <meta property="og:locale" content="en_US">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="iOS8, Popovers &amp; PassthroughViews">
+    <meta property="og:description" content="Blogging on iOS app development">
+    <meta property="og:url" content="http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/">
+    <meta property="og:site_name" content="Karmeye">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    
+    <meta name="twitter:title" content="iOS8, Popovers & PassthroughViews" />
+    <meta name="twitter:description" content="Getting passthroughViews to work on iOS8 when presenting a popover from a UIBarButton." />
+    <meta name="twitter:url" content="http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/" />
+
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/favicon-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/favicon-160x160.png" sizes="160x160">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+        
+    
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-106953-5']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    
+</head>
+
+<body class="site">
+  <div class="site-wrap">
+    <header class="site-header px2 px-responsive">
+  <div class="mt2 wrap">
+    <div class="measure">
+      <a href="http://karmeye.com" class="site-title">Karmeye</a>
+      <nav class="site-nav">
+        <a href="/">Posts</a>
+<a href="/apps/">Apps</a>
+<a href="/about/">About</a>
+
+
+
+      </nav>
+      <div class="clearfix"></div>
+      
+    </div>
+  </div>
+</header>
+
+
+    <div class="post p2 p-responsive wrap" role="main">
+      <div class="measure">
+        
+
+
+<div class="post-header mb2">
+  <h1>iOS8, Popovers & PassthroughViews</h1>
+  <span class="post-meta">Nov 20, 2014</span><br>
+    
+  <span class="post-meta small">
+  
+    4 minute read
+  
+  </span>
+</div>
+
+<article class="post-content">
+  <p>When presenting a popover you can set the <code>passthroughViews</code> property to control which views that can receive touches while the popover is visible. Tapping on views that are not included will cause the popover to dismiss.</p>
+
+<p>When presenting a popover from a <code>UIBarButtonItem</code> iOS adds some views by default to the <code>passthroughViews</code> property (see discussion below.).</p>
+
+<p>To present a popover without any passthroughViews on iOS7 you could do the following:</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="bp">UIPopoverController</span> <span class="o">*</span><span class="n">popoverController</span> <span class="o">=</span> <span class="p">...</span>
+<span class="p">[</span><span class="n">popoverController</span> <span class="nl">presentPopoverFromBarButtonItem</span><span class="p">:</span><span class="n">barButtonItem</span> <span class="nl">permittedArrowDirections</span><span class="p">:</span><span class="n">arrowDirections</span> <span class="nl">animated</span><span class="p">:</span><span class="n">animated</span><span class="p">];</span>
+                                                                   
+<span class="c1">// Needs to be set after presentation to take effect.     </span>
+<span class="n">popoverController</span><span class="p">.</span><span class="n">passthroughViews</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span></code></pre></div>
+
+<p>This no longer works on iOS 8 (up to 8.1.1 at the time of writing). The <code>passthroughViews</code> assignment is ignored / overwritten.</p>
+
+<p>Well on iOS8 you should actually use the new <code>UIPopoverPresentationController</code> to present a popover instead. Let’s see if that works.</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="n">viewController</span><span class="p">.</span><span class="n">modalPresentationStyle</span> <span class="o">=</span> <span class="n">UIModalPresentationPopover</span><span class="p">;</span>
+
+<span class="n">UIPopoverPresentationController</span> <span class="o">*</span><span class="n">presentationController</span> <span class="o">=</span> <span class="n">viewController</span><span class="p">.</span><span class="n">popoverPresentationController</span><span class="p">;</span>
+<span class="n">presentationController</span><span class="p">.</span><span class="n">barButtonItem</span> <span class="o">=</span> <span class="n">sender</span><span class="p">;</span>
+<span class="n">presentationController</span><span class="p">.</span><span class="n">passthroughViews</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="n">presentationController</span><span class="p">.</span><span class="n">permittedArrowDirections</span> <span class="o">=</span> <span class="n">UIPopoverArrowDirectionUp</span><span class="p">;</span>
+
+<span class="p">[</span><span class="nb">self</span> <span class="nl">presentViewController</span><span class="p">:</span><span class="n">viewController</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span> <span class="nl">completion</span><span class="p">:</span><span class="nb">NULL</span><span class="p">];</span></code></pre></div>
+
+<p>No, did not work either. Touches goes through to other bar buttons on the same toolbar without the popover dismissing. Trying to set <code>passthroughViews</code> on the next line after presenting the view controller does not help either as it did on iOS7 with the <code>UIPopoverController</code>.</p>
+
+<p>Turns out waiting even longer than just the line below the presentation gets it working on iOS 8.</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="bp">UIPopoverController</span> <span class="o">*</span><span class="n">popoverController</span> <span class="o">=</span> <span class="p">...</span>
+<span class="p">[</span><span class="n">popoverController</span> <span class="nl">presentPopoverFromBarButtonItem</span><span class="p">:</span><span class="n">barButtonItem</span> <span class="nl">permittedArrowDirections</span><span class="p">:</span><span class="n">arrowDirections</span> <span class="nl">animated</span><span class="p">:</span><span class="n">animated</span><span class="p">];</span>
+
+<span class="c1">/// Wait 0.1 sec.                                                                   </span>
+<span class="kt">int64_t</span> <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int64_t</span><span class="p">)(</span><span class="mf">1.0e9</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">);</span>
+<span class="n">dispatch_after</span><span class="p">(</span><span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="n">delta</span><span class="p">),</span> <span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+  <span class="n">popoverController</span><span class="p">.</span><span class="n">passthroughViews</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>	
+<span class="p">});</span></code></pre></div>
+
+<p>With <code>UIPopoverPresentationController</code> on iOS8 it gets a bit more elegant since we have a completion handler:</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="n">viewController</span><span class="p">.</span><span class="n">modalPresentationStyle</span> <span class="o">=</span> <span class="n">UIModalPresentationPopover</span><span class="p">;</span>
+
+<span class="n">UIPopoverPresentationController</span> <span class="o">*</span><span class="n">presentationController</span> <span class="o">=</span> <span class="n">viewController</span><span class="p">.</span><span class="n">popoverPresentationController</span><span class="p">;</span>
+<span class="n">presentationController</span><span class="p">.</span><span class="n">barButtonItem</span> <span class="o">=</span> <span class="n">sender</span><span class="p">;</span>
+<span class="n">presentationController</span><span class="p">.</span><span class="n">permittedArrowDirections</span> <span class="o">=</span> <span class="n">UIPopoverArrowDirectionUp</span><span class="p">;</span>
+
+<span class="p">[</span><span class="nb">self</span> <span class="nl">presentViewController</span><span class="p">:</span><span class="n">viewController</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span> <span class="nl">completion</span><span class="p">:</span><span class="o">^</span><span class="p">{</span>
+  <span class="n">presentationController</span><span class="p">.</span><span class="n">passthroughViews</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="p">}];</span></code></pre></div>
+
+<h1 id="discussion">Discussion</h1>
+
+<hr />
+
+<p>When presenting the popover providing a <em>view</em> and a <em>frame</em> instead of a bar button this issue with the <code>passthroughViews</code> works as expected.  The <code>passthroughViews</code> can be set before presenting the popover and certainly without any delay. The reason <em>could be</em> that in this case the <code>passthroughViews</code> property is not modified by default.</p>
+
+<p>The docs on presenting from a bar button clearly states that the <code>passthroughViews</code> property is tampered with.</p>
+
+<p>Apple doc for <code>UIPopoverController</code> method <code>presentPopoverFromBarButtonItem:permittedArrowDirections:animated:</code></p>
+
+<blockquote>
+  <p>When presenting the popover, this method adds the toolbar that owns the button to the popover’s list of passthrough views.</p>
+</blockquote>
+
+<p>For the new iOS8  <code>UIPopoverPresentationController</code>’s <code>barButtonItem</code> property the Apple doc states:</p>
+
+<blockquote>
+  <p>Prior to presentation, the presentation controller adds all sibling bar button items of the specified item (but not the item itself) to the popover’s list of passthrough views.</p>
+</blockquote>
+
+<p>The difference is that with <code>UIPopoverController</code> the whole <code>UINavigationBar</code>/<code>UIToolbar</code> that the bar button item belongs to is added by default as a passthrough view and with <code>UIPopoverPresentationController</code> only the actual buttons on the same <code>UINavigationBar</code>/<code>UIToolbar</code> as the bar button item are added (so tapping between buttons dismisses the popover).</p>
+
+<p>Both documentations then instructs:</p>
+
+<blockquote>
+  <p>If you want taps in the other bar button items to dismiss the popover, you must add code to the action handlers of those items to do so yourself.</p>
+</blockquote>
+
+<p>Are they actually prohibiting the use of <code>passthroughViews</code> when presenting from a bar button?
+Much easier to set the <code>passthroughViews</code> to <code>nil</code>, right?</p>
+
+<p>However, the <a href="https://developer.apple.com/library/ios/documentation/userexperience/conceptual/mobilehig/ContentViews.html#//apple_ref/doc/uid/TP40006556-CH13-SW1">HIG</a> states:</p>
+
+<blockquote>
+  <p>When possible, allow people to close one popover and open a new one with one tap. This behavior is especially desirable when several different bar buttons each open a popover, because it prevents people from having to make extra taps.</p>
+</blockquote>
+
+<p>So if there are other bar button items on the same toolbar that also presents a popover, setting the <code>passthroughViews</code> to <code>nil</code> is not suitable as a fast fix because it will force 2 taps to open the next popover.</p>
+
+<h1 id="links">Links</h1>
+
+<hr />
+
+<p><a href="http://openradar.appspot.com/17406793">Possibly related radar</a></p>
+
+
+</article>
+
+
+
+
+
+
+
+
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="center">
+  <div class="measure">
+    <small>
+        By Karmeye (<a href="https://twitter.com/karmeye">@karmeye</a>).
+    </small>
+  </div>
+</footer>
+
+</body>
+</html>

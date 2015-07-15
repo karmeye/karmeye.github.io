@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Karmeye</title>
+    <description>Blogging on iOS app development</description>
+    <link>http://karmeye.com/</link>
+    <atom:link href="http://karmeye.com/feed.xml" rel="self" type="application/rss+xml" />
+    
+      <item>
+        <title>UIDocumentPicker and NSFileCoordinator</title>
+        <description>&lt;p&gt;When using &lt;code&gt;UIDocumentPickerViewController&lt;/code&gt; with either &lt;code&gt;UIDocumentPickerModeOpen&lt;/code&gt; or &lt;code&gt;UIDocumentPickerModeMove&lt;/code&gt; you are given access to files outside the app’s sandbox. You are then required to use a &lt;code&gt;NSFileCoordinator&lt;/code&gt; when accessing files since other processes might  potentially be accessing them simultaneously / concurrently.&lt;/p&gt;
+
+&lt;p&gt;Using &lt;code&gt;UIDocument&lt;/code&gt; you get this, and more, for free. But what if you do not want your logic in the UI layer. Say you want the UI layer just to fetch the file URL by presenting the &lt;code&gt;DocumentPicker&lt;/code&gt; and then pass it down to a lower layer, a layer that is unaware of any UI (UIKit or AppKit).&lt;/p&gt;
+
+&lt;h3 id=&quot;create-a-document-class&quot;&gt;Create a Document class&lt;/h3&gt;
+&lt;p&gt;It’s pretty easy to make one’s own &lt;code&gt;UIDocument&lt;/code&gt; class for the purpose of handling access with &lt;code&gt;NSFileCoordinator&lt;/code&gt; (Of course, &lt;code&gt;UIDocument &lt;/code&gt; does much more). The initializer could be declared in the same way:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;instancetype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;initWithFileURL:&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;NSURL&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;fileURL&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fileURL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;isFileURL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;super&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;_fileURL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fileURL&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;URLs pointing to files outside the app’s sandbox are security scoped. Copying a security-scoped &lt;code&gt;NSURL&lt;/code&gt; retains the security scope of the original.&lt;/p&gt;
+
+&lt;p&gt;Before accessing the URL, &lt;code&gt;startAccessingSecurityScopedResource&lt;/code&gt; must be called; this method should always be paired with &lt;code&gt;stopAccessingSecurityScopedResource&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ensureStartAccessingSecurityScopedResource&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fileURL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;startAccessingSecurityScopedResource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;_isFileURLSecurityScoped&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;YES&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;stopAccessingSecurityScopedResource&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_isFileURLSecurityScoped&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fileURL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stopAccessingSecurityScopedResource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;_isFileURLSecurityScoped&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;stopAccessingSecurityScopedResource&lt;/code&gt; should be called as soon as possible after file access is done. One app is not allowed to have too many security scoped files open for access as the same time, &lt;code&gt;startAccessingSecurityScopedResource&lt;/code&gt; will return &lt;code&gt;NO&lt;/code&gt;. To be on the safe side, one could make a safty call in &lt;code&gt;dealloc&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;dealloc&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stopAccessingSecurityScopedResource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;For simplicity, we are not tracking the files state here, just reading it once into memory. So we do not pass a &lt;code&gt;NSFilePresenter&lt;/code&gt; when creating the &lt;code&gt;NSFileCoordinator&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;NSFileCoordinator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;fileCoordinator&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_fileCoordinator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;_fileCoordinator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;NSFileCoordinator&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;initWithFilePresenter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_fileCoordinator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;NSFileCoordinator&lt;/code&gt; needs a queue when coordinating file access asynchronously (asynchronous access is new in iOS8).&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;NSOperationQueue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;queue&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;_queue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;NSOperationQueue&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;An example of coordinated access might look like this.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;dataWithCallbackQueue:&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;dispatch_queue_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;callbackQueue&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;completionHandler:&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;NSData&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;NSError&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;completionHandler&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ensureStartAccessingSecurityScopedResource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;NSFileAccessIntent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readingIntent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NSFileAccessIntent&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;readingIntentWithURL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fileURL&lt;/span&gt;
+                                                                         &lt;span class=&quot;nl&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NSFileCoordinatorReadingWithoutChanges&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+                                                                                       
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fileCoordinator&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;coordinateAccessWithIntents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;l&quot;&gt;@[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readingIntent&lt;/span&gt;&lt;span class=&quot;l&quot;&gt;]&lt;/span&gt;
+                                                &lt;span class=&quot;nl&quot;&gt;queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;
+                                           &lt;span class=&quot;nl&quot;&gt;byAccessor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;NSError&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+                                               &lt;span class=&quot;bp&quot;&gt;NSData&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                                               
+                                               &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                                               &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                                                   &lt;span class=&quot;c1&quot;&gt;// Always get URL from access intent. It might have changed.&lt;/span&gt;
+                                                   &lt;span class=&quot;bp&quot;&gt;NSURL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;safeURL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;readingIntent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;URL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                                                   
+                                                   &lt;span class=&quot;c1&quot;&gt;// Read URL                                                   &lt;/span&gt;
+                                                   &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;readFromURL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;safeURL&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+                                               &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+                                               
+                                               &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stopAccessingSecurityScopedResource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+                                               &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;callbackQueue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
+                                               &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                                                   &lt;span class=&quot;n&quot;&gt;dispatch_async&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;callbackQueue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+                                                       &lt;span class=&quot;n&quot;&gt;completionHandler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+                                                   &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+                                               &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+                                               &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; 
+                                               &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                                                   &lt;span class=&quot;n&quot;&gt;completionHandler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                                               &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;                                               
+                                           &lt;span class=&quot;p&quot;&gt;}];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Performing a coordinated read with the &lt;code&gt;NSFileCoordinator&lt;/code&gt; also might trigger the download of the file if for example the user picked an iCloud document that is not yet locally on the device. The accessor block above will be called after the file is downloaded. Testing with a 600 MB file it took about 20 mins until the accessor block was invoked.&lt;/p&gt;
+
+&lt;p&gt;Other document providers such as &lt;em&gt;Box&lt;/em&gt; or &lt;em&gt;Google Drive&lt;/em&gt; downloads the document before the &lt;code&gt;UIDocumentPickerViewController&lt;/code&gt; is dismissed and it’s delegate provides the file URL. So in these cases the accessor block will be called as soon as it is safe for the app to access the file, probably instantly.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Note that &lt;code&gt;startAccessingSecurityScopedResource&lt;/code&gt; and &lt;code&gt;stopAccessingSecurityScopedResource&lt;/code&gt; of &lt;code&gt;NSURL&lt;/code&gt; and &lt;code&gt;NSFileCoordinator&lt;/code&gt;’s &lt;code&gt;coordinateAccessWithIntents:queue:byAccessor&lt;/code&gt; are all new in iOS8.&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 18 Dec 2014 00:00:00 +0200</pubDate>
+        <link>http://karmeye.com/2014/12/18/uidocumentpicker-nsfilecoordinator/</link>
+        <guid isPermaLink="true">http://karmeye.com/2014/12/18/uidocumentpicker-nsfilecoordinator/</guid>
+      </item>
+    
+      <item>
+        <title>iOS8, Popovers &amp; PassthroughViews</title>
+        <description>&lt;p&gt;When presenting a popover you can set the &lt;code&gt;passthroughViews&lt;/code&gt; property to control which views that can receive touches while the popover is visible. Tapping on views that are not included will cause the popover to dismiss.&lt;/p&gt;
+
+&lt;p&gt;When presenting a popover from a &lt;code&gt;UIBarButtonItem&lt;/code&gt; iOS adds some views by default to the &lt;code&gt;passthroughViews&lt;/code&gt; property (see discussion below.).&lt;/p&gt;
+
+&lt;p&gt;To present a popover without any passthroughViews on iOS7 you could do the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;bp&quot;&gt;UIPopoverController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;popoverController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;popoverController&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;presentPopoverFromBarButtonItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;barButtonItem&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;permittedArrowDirections&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arrowDirections&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;animated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;animated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+                                                                   
+&lt;span class=&quot;c1&quot;&gt;// Needs to be set after presentation to take effect.     &lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;popoverController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;passthroughViews&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This no longer works on iOS 8 (up to 8.1.1 at the time of writing). The &lt;code&gt;passthroughViews&lt;/code&gt; assignment is ignored / overwritten.&lt;/p&gt;
+
+&lt;p&gt;Well on iOS8 you should actually use the new &lt;code&gt;UIPopoverPresentationController&lt;/code&gt; to present a popover instead. Let’s see if that works.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;n&quot;&gt;viewController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;modalPresentationStyle&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;UIModalPresentationPopover&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;UIPopoverPresentationController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;presentationController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;viewController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;popoverPresentationController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;presentationController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;barButtonItem&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sender&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;presentationController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;passthroughViews&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;presentationController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;permittedArrowDirections&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;UIPopoverArrowDirectionUp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;presentViewController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;viewController&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;animated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;YES&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;completion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;No, did not work either. Touches goes through to other bar buttons on the same toolbar without the popover dismissing. Trying to set &lt;code&gt;passthroughViews&lt;/code&gt; on the next line after presenting the view controller does not help either as it did on iOS7 with the &lt;code&gt;UIPopoverController&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Turns out waiting even longer than just the line below the presentation gets it working on iOS 8.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;bp&quot;&gt;UIPopoverController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;popoverController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;popoverController&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;presentPopoverFromBarButtonItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;barButtonItem&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;permittedArrowDirections&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arrowDirections&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;animated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;animated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;/// Wait 0.1 sec.                                                                   &lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;int64_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;delta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int64_t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0e9&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;dispatch_after&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dispatch_time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DISPATCH_TIME_NOW&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;delta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dispatch_get_main_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;popoverController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;passthroughViews&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;	
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;With &lt;code&gt;UIPopoverPresentationController&lt;/code&gt; on iOS8 it gets a bit more elegant since we have a completion handler:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;n&quot;&gt;viewController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;modalPresentationStyle&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;UIModalPresentationPopover&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;UIPopoverPresentationController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;presentationController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;viewController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;popoverPresentationController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;presentationController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;barButtonItem&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sender&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;presentationController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;permittedArrowDirections&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;UIPopoverArrowDirectionUp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;presentViewController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;viewController&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;animated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;YES&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;completion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;presentationController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;passthroughViews&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}];&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;discussion&quot;&gt;Discussion&lt;/h1&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;When presenting the popover providing a &lt;em&gt;view&lt;/em&gt; and a &lt;em&gt;frame&lt;/em&gt; instead of a bar button this issue with the &lt;code&gt;passthroughViews&lt;/code&gt; works as expected.  The &lt;code&gt;passthroughViews&lt;/code&gt; can be set before presenting the popover and certainly without any delay. The reason &lt;em&gt;could be&lt;/em&gt; that in this case the &lt;code&gt;passthroughViews&lt;/code&gt; property is not modified by default.&lt;/p&gt;
+
+&lt;p&gt;The docs on presenting from a bar button clearly states that the &lt;code&gt;passthroughViews&lt;/code&gt; property is tampered with.&lt;/p&gt;
+
+&lt;p&gt;Apple doc for &lt;code&gt;UIPopoverController&lt;/code&gt; method &lt;code&gt;presentPopoverFromBarButtonItem:permittedArrowDirections:animated:&lt;/code&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;When presenting the popover, this method adds the toolbar that owns the button to the popover’s list of passthrough views.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;For the new iOS8  &lt;code&gt;UIPopoverPresentationController&lt;/code&gt;’s &lt;code&gt;barButtonItem&lt;/code&gt; property the Apple doc states:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Prior to presentation, the presentation controller adds all sibling bar button items of the specified item (but not the item itself) to the popover’s list of passthrough views.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The difference is that with &lt;code&gt;UIPopoverController&lt;/code&gt; the whole &lt;code&gt;UINavigationBar&lt;/code&gt;/&lt;code&gt;UIToolbar&lt;/code&gt; that the bar button item belongs to is added by default as a passthrough view and with &lt;code&gt;UIPopoverPresentationController&lt;/code&gt; only the actual buttons on the same &lt;code&gt;UINavigationBar&lt;/code&gt;/&lt;code&gt;UIToolbar&lt;/code&gt; as the bar button item are added (so tapping between buttons dismisses the popover).&lt;/p&gt;
+
+&lt;p&gt;Both documentations then instructs:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;If you want taps in the other bar button items to dismiss the popover, you must add code to the action handlers of those items to do so yourself.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Are they actually prohibiting the use of &lt;code&gt;passthroughViews&lt;/code&gt; when presenting from a bar button?
+Much easier to set the &lt;code&gt;passthroughViews&lt;/code&gt; to &lt;code&gt;nil&lt;/code&gt;, right?&lt;/p&gt;
+
+&lt;p&gt;However, the &lt;a href=&quot;https://developer.apple.com/library/ios/documentation/userexperience/conceptual/mobilehig/ContentViews.html#//apple_ref/doc/uid/TP40006556-CH13-SW1&quot;&gt;HIG&lt;/a&gt; states:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;When possible, allow people to close one popover and open a new one with one tap. This behavior is especially desirable when several different bar buttons each open a popover, because it prevents people from having to make extra taps.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;So if there are other bar button items on the same toolbar that also presents a popover, setting the &lt;code&gt;passthroughViews&lt;/code&gt; to &lt;code&gt;nil&lt;/code&gt; is not suitable as a fast fix because it will force 2 taps to open the next popover.&lt;/p&gt;
+
+&lt;h1 id=&quot;links&quot;&gt;Links&lt;/h1&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://openradar.appspot.com/17406793&quot;&gt;Possibly related radar&lt;/a&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 20 Nov 2014 00:00:00 +0200</pubDate>
+        <link>http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/</link>
+        <guid isPermaLink="true">http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/</guid>
+      </item>
+    
+      <item>
+        <title>What to put in a Xcode Resource folder?</title>
+        <description>&lt;p&gt;If you have a folder in Xcode called &lt;code&gt;Resources&lt;/code&gt; what type of files are fitted to
+put in there?&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Image files&lt;/li&gt;
+  &lt;li&gt;Asset Catalogs&lt;/li&gt;
+  &lt;li&gt;Fonts files&lt;/li&gt;
+  &lt;li&gt;Info plist files for targets&lt;/li&gt;
+  &lt;li&gt;String files&lt;/li&gt;
+  &lt;li&gt;Resource bundles&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 12 Oct 2014 00:00:00 +0300</pubDate>
+        <link>http://karmeye.com/xcode/2014/10/12/what-is-a-resource/</link>
+        <guid isPermaLink="true">http://karmeye.com/xcode/2014/10/12/what-is-a-resource/</guid>
+      </item>
+    
+      <item>
+        <title>The third-party folder name</title>
+        <description>&lt;p&gt;If you have a folder in Xcode called where you put all your third party dependencies, what do you call it?&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;3rdParty&lt;/li&gt;
+  &lt;li&gt;External&lt;/li&gt;
+  &lt;li&gt;Pods&lt;/li&gt;
+  &lt;li&gt;Vendor&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 12 Oct 2014 00:00:00 +0300</pubDate>
+        <link>http://karmeye.com/xcode/2014/10/12/naming-third-party-folder/</link>
+        <guid isPermaLink="true">http://karmeye.com/xcode/2014/10/12/naming-third-party-folder/</guid>
+      </item>
+    
+      <item>
+        <title>Open in menu sheet in iOS8</title>
+        <description>&lt;p&gt;&lt;em&gt;This is a draft.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;In iOS 7 and earlier one could delete any temporary files in &lt;code&gt;documentInteractionControllerDidDismissOptionsMenu:&lt;/code&gt;. In iOS 8 there is no way to know when to clean up.&lt;/p&gt;
+
+&lt;h5 id=&quot;sending-a-file-to-an-app-in-ios-7&quot;&gt;Sending a file to an app in iOS 7&lt;/h5&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerWillPresentOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;willBeginSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;didEndSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerDidDismissOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h5 id=&quot;sending-a-file-to-an-app-in-ios-8&quot;&gt;Sending a file to an app in iOS 8&lt;/h5&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerWillPresentOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerDidDismissOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;willBeginSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;didEndSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h5 id=&quot;sending-a-600-mb-file-to-an-app-in-ios-7&quot;&gt;Sending a 600 MB file to an app in iOS 7&lt;/h5&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;c1&quot;&gt;// 16:54:41:282&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerWillPresentOpenInMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; 
+&lt;span class=&quot;c1&quot;&gt;// 16:54:53:186&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;willBeginSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; 
+&lt;span class=&quot;c1&quot;&gt;// 16:54:53:724 &lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerDidDismissOpenInMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;c1&quot;&gt;// 16:55:05:468&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;didEndSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h5 id=&quot;cancelling-sending-a-file-to-an-app-in-ios-7&quot;&gt;Cancelling sending a file to an app in iOS 7&lt;/h5&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerWillPresentOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerDidDismissOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h5 id=&quot;cancelling-sending-a-file-to-an-app-in-ios-8&quot;&gt;Cancelling sending a file to an app in iOS 8&lt;/h5&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerWillPresentOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerDidDismissOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+</description>
+        <pubDate>Mon, 06 Oct 2014 00:00:00 +0300</pubDate>
+        <link>http://karmeye.com/2014/10/06/uidocumentinteractioncontroller-ios-7-vs-8/</link>
+        <guid isPermaLink="true">http://karmeye.com/2014/10/06/uidocumentinteractioncontroller-ios-7-vs-8/</guid>
+      </item>
+    
+      <item>
+        <title>Checking versions</title>
+        <description>&lt;p&gt;&lt;em&gt;This is a draft.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;runtime-check-of-ios-version-installed-on-the-device&quot;&gt;Runtime check of iOS version installed on the device&lt;/h2&gt;
+
+&lt;h4 id=&quot;uidevice-systemversion&quot;&gt;UIDevice systemVersion&lt;/h4&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;UIDevice&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;currentDevice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;systemVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;```objc&lt;/p&gt;
+
+&lt;p&gt;NSUInteger DeviceSystemMajorVersion(void)
+{
+  static NSUInteger deviceSystemMajorVersion = -1;
+  static dispatch_once_t onceToken;
+  dispatch_once(&amp;amp;onceToken, ^{
+    deviceSystemMajorVersion = [[[[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@”.”] objectAtIndex:0] intValue];
+  });
+  return deviceSystemMajorVersion;
+}&lt;/p&gt;
+
+&lt;p&gt;```&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Xcode 5 + iOS 6 device = 6&lt;br /&gt;
+Xcode 5 + iOS 7 device = 7&lt;br /&gt;
+Xcode 5 + iOS 8 device = 8&lt;/p&gt;
+
+&lt;p&gt;Xcode 6 + iOS 6 device = 6&lt;br /&gt;
+Xcode 6 + iOS 7 device = 7&lt;br /&gt;
+Xcode 6 + iOS 8 device = 8&lt;/p&gt;
+
+&lt;h4 id=&quot;nsfoundationversionnumber&quot;&gt;NSFoundationVersionNumber&lt;/h4&gt;
+
+&lt;p&gt;These are defined in the &lt;em&gt;Foundation&lt;/em&gt; framework, file &lt;em&gt;NSObjCRuntime.h&lt;/em&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#define NSFoundationVersionNumber_iOS_5_0  881.00&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define NSFoundationVersionNumber_iOS_5_1  890.10&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define NSFoundationVersionNumber_iOS_6_0  992.00&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define NSFoundationVersionNumber_iOS_6_1  993.00&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define NSFoundationVersionNumber_iOS_7_0 1047.20&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define NSFoundationVersionNumber_iOS_7_1 1047.25&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Xcode 5 + iOS 6.1.3 device = 993.00
+Xcode 5 + iOS 7.1.2 device = 1047.25
+Xcode 5 + iOS 8.0.2 device = 1140.11&lt;/p&gt;
+
+&lt;p&gt;Xcode 6 + iOS 6.1.3 device = 993.00
+Xcode 6 + iOS 7.1.2 device = 1047.25&lt;br /&gt;
+Xcode 6 + iOS 8.0.2 device = 1140.11&lt;/p&gt;
+
+&lt;h4 id=&quot;kcfcorefoundationversionnumber&quot;&gt;kCFCoreFoundationVersionNumber&lt;/h4&gt;
+
+&lt;p&gt;These are defined in the &lt;em&gt;CoreFoundation&lt;/em&gt; framework, file &lt;em&gt;CFBase.h&lt;/em&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#define kCFCoreFoundationVersionNumber_iOS_5_0 675.00&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define kCFCoreFoundationVersionNumber_iOS_5_1 690.10&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define kCFCoreFoundationVersionNumber_iOS_6_0 793.00&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define kCFCoreFoundationVersionNumber_iOS_6_1 793.00&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define kCFCoreFoundationVersionNumber_iOS_7_0 847.20&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define kCFCoreFoundationVersionNumber_iOS_7_1 847.24&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Xcode 5.1.1 + iOS 6.1.3 device = 793.00
+Xcode 5.1.1 + iOS 7.1.2 device = 847.27
+Xcode 5.1.1 + iOS 8.0.2 device = 1140.10&lt;/p&gt;
+
+&lt;p&gt;Xcode 6 + iOS 6.1.3 device = 793.00
+Xcode 6 + iOS 7.1.2 device = 847.27
+Xcode 6 + iOS 8.0.2 device = 1140.10&lt;/p&gt;
+
+&lt;h4 id=&quot;ios8&quot;&gt;iOS8&lt;/h4&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;n&quot;&gt;NSOperatingSystemVersion&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ios8_0_0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ios8_0_0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;majorVersion&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ios8_0_0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;minorVersion&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ios8_0_0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;patchVersion&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;NSProcessInfo&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;processInfo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;isOperatingSystemAtLeastVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ios8_0_0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;isAtLeastSDKVersion8&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;YES&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;summary&quot;&gt;Summary&lt;/h3&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;compile-time-check-of-ios-version-installed-on-the-device&quot;&gt;Compile-time check of iOS version installed on the device&lt;/h2&gt;
+
+&lt;p&gt;Hmm..
+Let’s conclude that all checks for the installed version on the device the app currently is running must be done at runtime :)&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;compile-time-check-of-version-linked-against&quot;&gt;Compile-time check of version linked against&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;__IPHONE_OS_VERSION_MAX_ALLOWED&lt;/code&gt; is set to what the &lt;em&gt;Base SDK&lt;/em&gt; is set to in the Xcode build settings for the target.
+&lt;code&gt;__IPHONE_OS_VERSION_MIN_REQUIRED&lt;/code&gt; is set to what the &lt;em&gt;iOS Deployment Target&lt;/em&gt; is set to in the Xcode build settings for the target.&lt;/p&gt;
+
+&lt;p&gt;These are assigned the value of a constant &lt;code&gt;__IPHONE_X_Y&lt;/code&gt;, where X is the major version and Y is the minor version. These are defined in &lt;em&gt;Availability.h&lt;/em&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#define __IPHONE_5_0     50000&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define __IPHONE_5_1     50100&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define __IPHONE_6_0     60000&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define __IPHONE_6_1     60100&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define __IPHONE_7_0     70000&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define __IPHONE_7_1     70100&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#define __IPHONE_8_0     80000&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that if the main executable target is linking against a static library, these constants may not be equal between the executable target and the static library depending on the build settings for each project. For example &lt;code&gt;__IPHONE_OS_VERSION_MIN_REQUIRED&lt;/code&gt; could return &lt;code&gt;__IPHONE_7_0&lt;/code&gt; for the executable target and &lt;code&gt;__IPHONE_6_0&lt;/code&gt; for the static library target.&lt;/p&gt;
+
+&lt;p&gt;For example check this in code with preprocessor macros:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#if defined(__IPHONE_7_0) &amp;amp;&amp;amp; (__IPHONE_OS_VERSION_MAX_ALLOWED &amp;gt;= __IPHONE_7_0)&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// The target where this code is running is compiled with&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// the &amp;quot;Base SDK&amp;quot; Xcode build setting set to iOS 7 SDK or later.&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#else&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// &lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#endif&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Note that you must first check for the existance of &lt;code&gt;__IPHONE_7_0&lt;/code&gt; before comparing with it.&lt;/li&gt;
+  &lt;li&gt;Note that this is independent on the actual iOS installed on the device which is executing.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;runtime-check-of-version-linked-against&quot;&gt;Runtime check of version linked against&lt;/h2&gt;
+
+&lt;p&gt;https://gist.github.com/steipete/6526860&lt;/p&gt;
+
+&lt;h2 id=&quot;links&quot;&gt;Links&lt;/h2&gt;
+
+&lt;p&gt;http://stackoverflow.com/questions/3269344/what-is-difference-between-these-2-macros
+http://stackoverflow.com/questions/7542480/what-are-the-common-use-cases-for-iphone-os-version-max-allowed?lq=1&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 04 Oct 2014 00:00:00 +0300</pubDate>
+        <link>http://karmeye.com/2014/10/04/version-checking/</link>
+        <guid isPermaLink="true">http://karmeye.com/2014/10/04/version-checking/</guid>
+      </item>
+    
+      <item>
+        <title>Class Names</title>
+        <description>&lt;p&gt;Class names suffixes used in Apples obj-c frameworks.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Note: &lt;em&gt;The table below is updated every now and then.&lt;/em&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Name suffix&lt;/th&gt;
+      &lt;th&gt;Examples form iOS SDK&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Controller&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Coordinator&lt;/td&gt;
+      &lt;td&gt;NSFileCoordinator , NSPersistentStoreCoordinator&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Info&lt;/td&gt;
+      &lt;td&gt;NSProcessInfo&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Intent&lt;/td&gt;
+      &lt;td&gt;NSFileAccessIntent&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;InteractionController&lt;/td&gt;
+      &lt;td&gt;UIDocumentInteractionController&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Item&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Manager&lt;/td&gt;
+      &lt;td&gt;NSFileManager&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Provider&lt;/td&gt;
+      &lt;td&gt;UIActivityItemProvider&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Recipe&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Relationship&lt;/td&gt;
+      &lt;td&gt;NSURLRelationship (enum)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Task&lt;/td&gt;
+      &lt;td&gt;NSURLSessionTask&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Tuple&lt;/td&gt;
+      &lt;td&gt;NSMetadataQueryAttributeValueTuple&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Utilities&lt;/td&gt;
+      &lt;td&gt;NSPathUtilities&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;!-- http://filippobiga.com/static/SpringBoard_8.0_hierarchy.svg --&gt;
+</description>
+        <pubDate>Fri, 03 Oct 2014 00:00:00 +0300</pubDate>
+        <link>http://karmeye.com/class-names/</link>
+        <guid isPermaLink="true">http://karmeye.com/class-names/</guid>
+      </item>
+    
+  </channel>
+</rss>

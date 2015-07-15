@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>UIDocumentPicker and NSFileCoordinator &#8211; Karmeye</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Using UIDocument you do not need to bother with NSFileCoordinator. But UIDocument is in... well UIKit.">
+    <meta name="author" content="">
+    <meta name="keywords" content="">
+    <link rel="canonical" href="http://karmeye.com/2014/12/18/uidocumentpicker-nsfilecoordinator/">
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed for Karmeye" href="/feed.xml" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/pixyll.css?201507151517" type="text/css">
+
+    <!-- Fonts -->
+    <link href='//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Lato:900,300' rel='stylesheet' type='text/css'>
+    
+
+
+    <!-- Open Graph -->
+    <!-- From: https://github.com/mmistakes/hpstr-jekyll-theme/blob/master/_includes/head.html -->
+    <meta property="og:locale" content="en_US">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="UIDocumentPicker and NSFileCoordinator">
+    <meta property="og:description" content="Blogging on iOS app development">
+    <meta property="og:url" content="http://karmeye.com/2014/12/18/uidocumentpicker-nsfilecoordinator/">
+    <meta property="og:site_name" content="Karmeye">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    
+    <meta name="twitter:title" content="UIDocumentPicker and NSFileCoordinator" />
+    <meta name="twitter:description" content="Using UIDocument you do not need to bother with NSFileCoordinator. But UIDocument is in... well UIKit." />
+    <meta name="twitter:url" content="http://karmeye.com/2014/12/18/uidocumentpicker-nsfilecoordinator/" />
+
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/favicon-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/favicon-160x160.png" sizes="160x160">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+        
+    
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-106953-5']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    
+</head>
+
+<body class="site">
+  <div class="site-wrap">
+    <header class="site-header px2 px-responsive">
+  <div class="mt2 wrap">
+    <div class="measure">
+      <a href="http://karmeye.com" class="site-title">Karmeye</a>
+      <nav class="site-nav">
+        <a href="/">Posts</a>
+<a href="/apps/">Apps</a>
+<a href="/about/">About</a>
+
+
+
+      </nav>
+      <div class="clearfix"></div>
+      
+    </div>
+  </div>
+</header>
+
+
+    <div class="post p2 p-responsive wrap" role="main">
+      <div class="measure">
+        
+
+
+<div class="post-header mb2">
+  <h1>UIDocumentPicker and NSFileCoordinator</h1>
+  <span class="post-meta">Dec 18, 2014</span><br>
+    
+  <span class="post-meta small">
+  
+    4 minute read
+  
+  </span>
+</div>
+
+<article class="post-content">
+  <p>When using <code>UIDocumentPickerViewController</code> with either <code>UIDocumentPickerModeOpen</code> or <code>UIDocumentPickerModeMove</code> you are given access to files outside the app’s sandbox. You are then required to use a <code>NSFileCoordinator</code> when accessing files since other processes might  potentially be accessing them simultaneously / concurrently.</p>
+
+<p>Using <code>UIDocument</code> you get this, and more, for free. But what if you do not want your logic in the UI layer. Say you want the UI layer just to fetch the file URL by presenting the <code>DocumentPicker</code> and then pass it down to a lower layer, a layer that is unaware of any UI (UIKit or AppKit).</p>
+
+<h3 id="create-a-document-class">Create a Document class</h3>
+<p>It’s pretty easy to make one’s own <code>UIDocument</code> class for the purpose of handling access with <code>NSFileCoordinator</code> (Of course, <code>UIDocument </code> does much more). The initializer could be declared in the same way:</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">initWithFileURL:</span><span class="p">(</span><span class="bp">NSURL</span><span class="o">*</span><span class="p">)</span><span class="nv">fileURL</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="n">fileURL</span> <span class="n">isFileURL</span><span class="p">])</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="nb">self</span> <span class="o">=</span> <span class="p">[</span><span class="nb">super</span> <span class="n">init</span><span class="p">];</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">_fileURL</span> <span class="o">=</span> <span class="p">[</span><span class="n">fileURL</span> <span class="k">copy</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nb">self</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+
+<p>URLs pointing to files outside the app’s sandbox are security scoped. Copying a security-scoped <code>NSURL</code> retains the security scope of the original.</p>
+
+<p>Before accessing the URL, <code>startAccessingSecurityScopedResource</code> must be called; this method should always be paired with <code>stopAccessingSecurityScopedResource</code>:</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">ensureStartAccessingSecurityScopedResource</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">([</span><span class="nb">self</span><span class="p">.</span><span class="n">fileURL</span> <span class="n">startAccessingSecurityScopedResource</span><span class="p">])</span> <span class="p">{</span>
+        <span class="n">_isFileURLSecurityScoped</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">stopAccessingSecurityScopedResource</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_isFileURLSecurityScoped</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">fileURL</span> <span class="n">stopAccessingSecurityScopedResource</span><span class="p">];</span>
+        <span class="n">_isFileURLSecurityScoped</span> <span class="o">=</span> <span class="nb">NO</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p><code>stopAccessingSecurityScopedResource</code> should be called as soon as possible after file access is done. One app is not allowed to have too many security scoped files open for access as the same time, <code>startAccessingSecurityScopedResource</code> will return <code>NO</code>. To be on the safe side, one could make a safty call in <code>dealloc</code>.</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">dealloc</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">stopAccessingSecurityScopedResource</span><span class="p">];</span>
+<span class="p">}</span></code></pre></div>
+
+<p>For simplicity, we are not tracking the files state here, just reading it once into memory. So we do not pass a <code>NSFilePresenter</code> when creating the <code>NSFileCoordinator</code>.</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="bp">NSFileCoordinator</span><span class="o">*</span><span class="p">)</span><span class="nf">fileCoordinator</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">_fileCoordinator</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">_fileCoordinator</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSFileCoordinator</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFilePresenter</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">_fileCoordinator</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+
+<p>The <code>NSFileCoordinator</code> needs a queue when coordinating file access asynchronously (asynchronous access is new in iOS8).</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="bp">NSOperationQueue</span><span class="o">*</span><span class="p">)</span><span class="nf">queue</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">_queue</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">_queue</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSOperationQueue</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">_queue</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+
+<p>An example of coordinated access might look like this.</p>
+
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">dataWithCallbackQueue:</span><span class="p">(</span><span class="kt">dispatch_queue_t</span><span class="p">)</span><span class="nv">callbackQueue</span> <span class="nf">completionHandler:</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="p">)(</span><span class="bp">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">))</span><span class="nv">completionHandler</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">ensureStartAccessingSecurityScopedResource</span><span class="p">];</span>
+
+    <span class="n">NSFileAccessIntent</span> <span class="o">*</span><span class="n">readingIntent</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSFileAccessIntent</span> <span class="nl">readingIntentWithURL</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">fileURL</span>
+                                                                         <span class="nl">options</span><span class="p">:</span><span class="n">NSFileCoordinatorReadingWithoutChanges</span><span class="p">];</span>
+                                                                                       
+    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">fileCoordinator</span> <span class="nl">coordinateAccessWithIntents</span><span class="p">:</span><span class="l">@[</span><span class="n">readingIntent</span><span class="l">]</span>
+                                                <span class="nl">queue</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">queue</span>
+                                           <span class="nl">byAccessor</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+
+                                               <span class="bp">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
+                                               
+                                               <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">error</span><span class="p">)</span>
+                                               <span class="p">{</span>
+                                                   <span class="c1">// Always get URL from access intent. It might have changed.</span>
+                                                   <span class="bp">NSURL</span> <span class="o">*</span><span class="n">safeURL</span> <span class="o">=</span> <span class="n">readingIntent</span><span class="p">.</span><span class="n">URL</span><span class="p">;</span>
+                                                   
+                                                   <span class="c1">// Read URL                                                   </span>
+                                                   <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">readFromURL</span><span class="p">:</span><span class="n">safeURL</span> <span class="nl">error</span><span class="p">:</span><span class="o">&amp;</span><span class="n">error</span><span class="p">];</span>
+                                               <span class="p">}</span>
+                                               
+                                               <span class="p">[</span><span class="nb">self</span> <span class="n">stopAccessingSecurityScopedResource</span><span class="p">];</span>
+
+                                               <span class="k">if</span> <span class="p">(</span><span class="n">callbackQueue</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> 
+                                               <span class="p">{</span>
+                                                   <span class="n">dispatch_async</span><span class="p">(</span><span class="n">callbackQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> 
+                                                       <span class="n">completionHandler</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span> 
+                                                   <span class="p">});</span>
+                                               <span class="p">}</span>
+                                               <span class="k">else</span> 
+                                               <span class="p">{</span>
+                                                   <span class="n">completionHandler</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
+                                               <span class="p">}</span>                                               
+                                           <span class="p">}];</span>
+<span class="p">}</span></code></pre></div>
+
+<p>Performing a coordinated read with the <code>NSFileCoordinator</code> also might trigger the download of the file if for example the user picked an iCloud document that is not yet locally on the device. The accessor block above will be called after the file is downloaded. Testing with a 600 MB file it took about 20 mins until the accessor block was invoked.</p>
+
+<p>Other document providers such as <em>Box</em> or <em>Google Drive</em> downloads the document before the <code>UIDocumentPickerViewController</code> is dismissed and it’s delegate provides the file URL. So in these cases the accessor block will be called as soon as it is safe for the app to access the file, probably instantly.</p>
+
+<hr />
+
+<p>Note that <code>startAccessingSecurityScopedResource</code> and <code>stopAccessingSecurityScopedResource</code> of <code>NSURL</code> and <code>NSFileCoordinator</code>’s <code>coordinateAccessWithIntents:queue:byAccessor</code> are all new in iOS8.</p>
+
+
+</article>
+
+
+
+
+
+
+
+
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="center">
+  <div class="measure">
+    <small>
+        By Karmeye (<a href="https://twitter.com/karmeye">@karmeye</a>).
+    </small>
+  </div>
+</footer>
+
+</body>
+</html>
