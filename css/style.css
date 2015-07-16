@@ -1124,3 +1124,8 @@ p a:hover, footer a:hover, li a:hover {
 
 .pagination .disabled {
   opacity: 0.0; }
+
+@media screen and (min-width: 32rem) {
+  h1,
+  .h1 {
+    font-size: 2.340rem; } }
