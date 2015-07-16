@@ -944,9 +944,9 @@ table {
   flex: 1; }
 
 footer {
-  background-color: #fafafa;
+  background-color: black;
   border-top: thin solid #f3f3f3;
-  color: #7a7a7a;
+  color: #eee;
   font-size: 0.75rem;
   font-weight: 300;
   padding: 2rem;
@@ -1107,3 +1107,17 @@ blockquote footer {
 .button-disabled:focus {
   cursor: not-allowed;
   background-color: #999; }
+
+body {
+  color: black;
+  background-color: #cfe3f2; }
+
+p {
+  color: black; }
+
+p a, footer a {
+  color: #c31362; }
+
+p a:hover, footer a:hover {
+  color: #c31362;
+  text-decoration: underline; }

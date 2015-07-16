@@ -276,10 +276,10 @@ put in there?&lt;/p&gt;
 
 &lt;h5 id=&quot;sending-a-file-to-an-app-in-ios-7&quot;&gt;Sending a file to an app in iOS 7&lt;/h5&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;lineno&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;documentInteractionControllerWillPresentOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
-&lt;span class=&quot;lineno&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;willBeginSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
-&lt;span class=&quot;lineno&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;didEndSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
-&lt;span class=&quot;lineno&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;documentInteractionControllerDidDismissOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerWillPresentOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;willBeginSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionController&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;didEndSendingToApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+&lt;span class=&quot;nl&quot;&gt;documentInteractionControllerDidDismissOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h5 id=&quot;sending-a-file-to-an-app-in-ios-8&quot;&gt;Sending a file to an app in iOS 8&lt;/h5&gt;
 
