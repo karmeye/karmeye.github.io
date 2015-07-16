@@ -444,12 +444,7 @@ Let’s conclude that all checks for the installed version on the device the app
 
 &lt;h2 id=&quot;runtime-check-of-version-linked-against&quot;&gt;Runtime check of version linked against&lt;/h2&gt;
 
-&lt;p&gt;https://gist.github.com/steipete/6526860&lt;/p&gt;
-
-&lt;h2 id=&quot;links&quot;&gt;Links&lt;/h2&gt;
-
-&lt;p&gt;http://stackoverflow.com/questions/3269344/what-is-difference-between-these-2-macros
-http://stackoverflow.com/questions/7542480/what-are-the-common-use-cases-for-iphone-os-version-max-allowed?lq=1&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;&quot;&gt;https://gist.github.com/steipete/6526860&lt;/a&gt;&lt;/p&gt;
 
 </description>
         <pubDate>Sat, 04 Oct 2014 00:00:00 +0300</pubDate>
@@ -461,17 +456,13 @@ http://stackoverflow.com/questions/7542480/what-are-the-common-use-cases-for-iph
         <title>Class Name Suffixes</title>
         <description>&lt;p&gt;Class names suffixes used in Apples obj-c frameworks.&lt;/p&gt;
 
-&lt;hr /&gt;
-
 &lt;p&gt;Note: &lt;em&gt;The table below is updated every now and then.&lt;/em&gt;&lt;/p&gt;
-
-&lt;hr /&gt;
 
 &lt;table&gt;
   &lt;thead&gt;
     &lt;tr&gt;
-      &lt;th&gt;Name suffix&lt;/th&gt;
-      &lt;th&gt;Examples form iOS SDK&lt;/th&gt;
+      &lt;th&gt;Suffix&lt;/th&gt;
+      &lt;th&gt;iOS SDK Example&lt;/th&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   &lt;tbody&gt;
@@ -530,7 +521,6 @@ http://stackoverflow.com/questions/7542480/what-are-the-common-use-cases-for-iph
   &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;!-- http://filippobiga.com/static/SpringBoard_8.0_hierarchy.svg --&gt;
 </description>
         <pubDate>Fri, 03 Oct 2014 00:00:00 +0300</pubDate>
         <link>http://karmeye.com/class-name-suffixes/</link>

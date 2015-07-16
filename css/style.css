@@ -1084,7 +1084,7 @@ blockquote footer {
   padding: 1em 1.5em; }
 
 .pagination .disabled {
-  opacity: 0.0; }
+  opacity: 0.5; }
 
 .pagination a:hover, .pagination a:focus {
   background: white;
@@ -1115,9 +1115,12 @@ body {
 p {
   color: black; }
 
-p a, footer a {
+p a, footer a, li a {
   color: #c31362; }
 
-p a:hover, footer a:hover {
+p a:hover, footer a:hover, li a:hover {
   color: #c31362;
   text-decoration: underline; }
+
+.pagination .disabled {
+  opacity: 0.0; }
