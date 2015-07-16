@@ -1129,3 +1129,16 @@ p a:hover, footer a:hover, li a:hover {
   h1,
   .h1 {
     font-size: 2.340rem; } }
+p pre,
+p code,
+p samp {
+  color: black;
+  font-size: 0.84rem; }
+
+pre,
+code,
+samp {
+  font-size: 0.68rem; }
+
+.highlight .p {
+  font-size: 0.68rem; }
