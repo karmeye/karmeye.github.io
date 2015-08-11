@@ -125,7 +125,7 @@
 &lt;p&gt;Note that &lt;code&gt;startAccessingSecurityScopedResource&lt;/code&gt; and &lt;code&gt;stopAccessingSecurityScopedResource&lt;/code&gt; of &lt;code&gt;NSURL&lt;/code&gt; and &lt;code&gt;NSFileCoordinator&lt;/code&gt;’s &lt;code&gt;coordinateAccessWithIntents:queue:byAccessor&lt;/code&gt; are all new in iOS8.&lt;/p&gt;
 
 </description>
-        <pubDate>Thu, 18 Dec 2014 00:00:00 +0200</pubDate>
+        <pubDate>Thu, 18 Dec 2014 00:00:00 +0100</pubDate>
         <link>http://karmeye.com/2014/12/18/uidocumentpicker-nsfilecoordinator/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/12/18/uidocumentpicker-nsfilecoordinator/</guid>
       </item>
@@ -210,7 +210,7 @@
   &lt;p&gt;If you want taps in the other bar button items to dismiss the popover, you must add code to the action handlers of those items to do so yourself.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;Are they actually prohibiting the use of &lt;code&gt;passthroughViews&lt;/code&gt; when presenting from a bar button?
+&lt;p&gt;Are they actually prohibiting the use of &lt;code&gt;passthroughViews&lt;/code&gt; when presenting from a bar button?&lt;br /&gt;
 Much easier to set the &lt;code&gt;passthroughViews&lt;/code&gt; to &lt;code&gt;nil&lt;/code&gt;, right?&lt;/p&gt;
 
 &lt;p&gt;However, the &lt;a href=&quot;https://developer.apple.com/library/ios/documentation/userexperience/conceptual/mobilehig/ContentViews.html#//apple_ref/doc/uid/TP40006556-CH13-SW1&quot;&gt;HIG&lt;/a&gt; states:&lt;/p&gt;
@@ -228,14 +228,14 @@ Much easier to set the &lt;code&gt;passthroughViews&lt;/code&gt; to &lt;code&gt;
 &lt;p&gt;&lt;a href=&quot;http://openradar.appspot.com/17406793&quot;&gt;Possibly related radar&lt;/a&gt;&lt;/p&gt;
 
 </description>
-        <pubDate>Thu, 20 Nov 2014 00:00:00 +0200</pubDate>
+        <pubDate>Thu, 20 Nov 2014 00:00:00 +0100</pubDate>
         <link>http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/</guid>
       </item>
     
       <item>
         <title>What to put in a Xcode Resource folder?</title>
-        <description>&lt;p&gt;If you have a folder in Xcode called &lt;code&gt;Resources&lt;/code&gt; what type of files are fitted to
+        <description>&lt;p&gt;If you have a folder in Xcode called &lt;code&gt;Resources&lt;/code&gt; what type of files are fitted to&lt;br /&gt;
 put in there?&lt;/p&gt;
 
 &lt;ul&gt;
@@ -247,7 +247,7 @@ put in there?&lt;/p&gt;
   &lt;li&gt;Resource bundles&lt;/li&gt;
 &lt;/ul&gt;
 </description>
-        <pubDate>Sun, 12 Oct 2014 00:00:00 +0300</pubDate>
+        <pubDate>Sun, 12 Oct 2014 00:00:00 +0200</pubDate>
         <link>http://karmeye.com/2014/10/12/what-is-a-resource/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/10/12/what-is-a-resource/</guid>
       </item>
@@ -263,7 +263,7 @@ put in there?&lt;/p&gt;
   &lt;li&gt;Vendor&lt;/li&gt;
 &lt;/ul&gt;
 </description>
-        <pubDate>Sun, 12 Oct 2014 00:00:00 +0300</pubDate>
+        <pubDate>Sun, 12 Oct 2014 00:00:00 +0200</pubDate>
         <link>http://karmeye.com/2014/10/12/naming-third-party-folder/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/10/12/naming-third-party-folder/</guid>
       </item>
@@ -310,7 +310,7 @@ put in there?&lt;/p&gt;
 &lt;span class=&quot;nl&quot;&gt;documentInteractionControllerDidDismissOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 </description>
-        <pubDate>Mon, 06 Oct 2014 00:00:00 +0300</pubDate>
+        <pubDate>Mon, 06 Oct 2014 00:00:00 +0200</pubDate>
         <link>http://karmeye.com/2014/10/06/uidocumentinteractioncontroller-ios-7-vs-8/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/10/06/uidocumentinteractioncontroller-ios-7-vs-8/</guid>
       </item>
@@ -325,28 +325,27 @@ put in there?&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objc&quot; data-lang=&quot;objc&quot;&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;UIDevice&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;currentDevice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;systemVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;```objc&lt;/p&gt;
-
-&lt;p&gt;NSUInteger DeviceSystemMajorVersion(void)
+&lt;pre&gt;&lt;code class=&quot;language-objc&quot;&gt;
+NSUInteger DeviceSystemMajorVersion(void)
 {
   static NSUInteger deviceSystemMajorVersion = -1;
   static dispatch_once_t onceToken;
   dispatch_once(&amp;amp;onceToken, ^{
-    deviceSystemMajorVersion = [[[[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@”.”] objectAtIndex:0] intValue];
+    deviceSystemMajorVersion = [[[[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@&quot;.&quot;] objectAtIndex:0] intValue];
   });
   return deviceSystemMajorVersion;
-}&lt;/p&gt;
+}
 
-&lt;p&gt;```&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;hr /&gt;
 
-&lt;p&gt;Xcode 5 + iOS 6 device = 6&lt;br /&gt;
-Xcode 5 + iOS 7 device = 7&lt;br /&gt;
+&lt;p&gt;Xcode 5 + iOS 6 device = 6  &lt;br /&gt;
+Xcode 5 + iOS 7 device = 7  &lt;br /&gt;
 Xcode 5 + iOS 8 device = 8&lt;/p&gt;
 
-&lt;p&gt;Xcode 6 + iOS 6 device = 6&lt;br /&gt;
-Xcode 6 + iOS 7 device = 7&lt;br /&gt;
+&lt;p&gt;Xcode 6 + iOS 6 device = 6  &lt;br /&gt;
+Xcode 6 + iOS 7 device = 7  &lt;br /&gt;
 Xcode 6 + iOS 8 device = 8&lt;/p&gt;
 
 &lt;h4 id=&quot;nsfoundationversionnumber&quot;&gt;NSFoundationVersionNumber&lt;/h4&gt;
@@ -360,12 +359,12 @@ Xcode 6 + iOS 8 device = 8&lt;/p&gt;
 &lt;span class=&quot;cp&quot;&gt;#define NSFoundationVersionNumber_iOS_7_0 1047.20&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#define NSFoundationVersionNumber_iOS_7_1 1047.25&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;Xcode 5 + iOS 6.1.3 device = 993.00
-Xcode 5 + iOS 7.1.2 device = 1047.25
+&lt;p&gt;Xcode 5 + iOS 6.1.3 device = 993.00&lt;br /&gt;
+Xcode 5 + iOS 7.1.2 device = 1047.25&lt;br /&gt;
 Xcode 5 + iOS 8.0.2 device = 1140.11&lt;/p&gt;
 
-&lt;p&gt;Xcode 6 + iOS 6.1.3 device = 993.00
-Xcode 6 + iOS 7.1.2 device = 1047.25&lt;br /&gt;
+&lt;p&gt;Xcode 6 + iOS 6.1.3 device = 993.00&lt;br /&gt;
+Xcode 6 + iOS 7.1.2 device = 1047.25  &lt;br /&gt;
 Xcode 6 + iOS 8.0.2 device = 1140.11&lt;/p&gt;
 
 &lt;h4 id=&quot;kcfcorefoundationversionnumber&quot;&gt;kCFCoreFoundationVersionNumber&lt;/h4&gt;
@@ -379,12 +378,12 @@ Xcode 6 + iOS 8.0.2 device = 1140.11&lt;/p&gt;
 &lt;span class=&quot;cp&quot;&gt;#define kCFCoreFoundationVersionNumber_iOS_7_0 847.20&lt;/span&gt;
 &lt;span class=&quot;cp&quot;&gt;#define kCFCoreFoundationVersionNumber_iOS_7_1 847.24&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;Xcode 5.1.1 + iOS 6.1.3 device = 793.00
-Xcode 5.1.1 + iOS 7.1.2 device = 847.27
+&lt;p&gt;Xcode 5.1.1 + iOS 6.1.3 device = 793.00&lt;br /&gt;
+Xcode 5.1.1 + iOS 7.1.2 device = 847.27&lt;br /&gt;
 Xcode 5.1.1 + iOS 8.0.2 device = 1140.10&lt;/p&gt;
 
-&lt;p&gt;Xcode 6 + iOS 6.1.3 device = 793.00
-Xcode 6 + iOS 7.1.2 device = 847.27
+&lt;p&gt;Xcode 6 + iOS 6.1.3 device = 793.00&lt;br /&gt;
+Xcode 6 + iOS 7.1.2 device = 847.27&lt;br /&gt;
 Xcode 6 + iOS 8.0.2 device = 1140.10&lt;/p&gt;
 
 &lt;h4 id=&quot;ios8&quot;&gt;iOS8&lt;/h4&gt;
@@ -404,14 +403,14 @@ Xcode 6 + iOS 8.0.2 device = 1140.10&lt;/p&gt;
 
 &lt;h2 id=&quot;compile-time-check-of-ios-version-installed-on-the-device&quot;&gt;Compile-time check of iOS version installed on the device&lt;/h2&gt;
 
-&lt;p&gt;Hmm..
+&lt;p&gt;Hmm..&lt;br /&gt;
 Let’s conclude that all checks for the installed version on the device the app currently is running must be done at runtime :)&lt;/p&gt;
 
 &lt;hr /&gt;
 
 &lt;h2 id=&quot;compile-time-check-of-version-linked-against&quot;&gt;Compile-time check of version linked against&lt;/h2&gt;
 
-&lt;p&gt;&lt;code&gt;__IPHONE_OS_VERSION_MAX_ALLOWED&lt;/code&gt; is set to what the &lt;em&gt;Base SDK&lt;/em&gt; is set to in the Xcode build settings for the target.
+&lt;p&gt;&lt;code&gt;__IPHONE_OS_VERSION_MAX_ALLOWED&lt;/code&gt; is set to what the &lt;em&gt;Base SDK&lt;/em&gt; is set to in the Xcode build settings for the target.&lt;br /&gt;
 &lt;code&gt;__IPHONE_OS_VERSION_MIN_REQUIRED&lt;/code&gt; is set to what the &lt;em&gt;iOS Deployment Target&lt;/em&gt; is set to in the Xcode build settings for the target.&lt;/p&gt;
 
 &lt;p&gt;These are assigned the value of a constant &lt;code&gt;__IPHONE_X_Y&lt;/code&gt;, where X is the major version and Y is the minor version. These are defined in &lt;em&gt;Availability.h&lt;/em&gt;.&lt;/p&gt;
@@ -447,7 +446,7 @@ Let’s conclude that all checks for the installed version on the device the app
 &lt;p&gt;&lt;a href=&quot;&quot;&gt;https://gist.github.com/steipete/6526860&lt;/a&gt;&lt;/p&gt;
 
 </description>
-        <pubDate>Sat, 04 Oct 2014 00:00:00 +0300</pubDate>
+        <pubDate>Sat, 04 Oct 2014 00:00:00 +0200</pubDate>
         <link>http://karmeye.com/2014/10/04/version-checking/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/10/04/version-checking/</guid>
       </item>
@@ -522,7 +521,7 @@ Let’s conclude that all checks for the installed version on the device the app
 &lt;/table&gt;
 
 </description>
-        <pubDate>Fri, 03 Oct 2014 00:00:00 +0300</pubDate>
+        <pubDate>Fri, 03 Oct 2014 00:00:00 +0200</pubDate>
         <link>http://karmeye.com/class-name-suffixes/</link>
         <guid isPermaLink="true">http://karmeye.com/class-name-suffixes/</guid>
       </item>
