@@ -286,25 +286,6 @@ Much easier to set the &lt;code&gt;passthroughViews&lt;/code&gt; to &lt;code&gt;
       </item>
     
       <item>
-        <title>What to put in a Xcode Resource folder?</title>
-        <description>&lt;p&gt;If you have a folder in Xcode called &lt;code&gt;Resources&lt;/code&gt; what type of files are fitted to&lt;br /&gt;
-put in there?&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Image files&lt;/li&gt;
-  &lt;li&gt;Asset Catalogs&lt;/li&gt;
-  &lt;li&gt;Fonts files&lt;/li&gt;
-  &lt;li&gt;Info plist files for targets&lt;/li&gt;
-  &lt;li&gt;String files&lt;/li&gt;
-  &lt;li&gt;Resource bundles&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Sun, 12 Oct 2014 00:00:00 +0300</pubDate>
-        <link>http://karmeye.com/2014/10/12/what-is-a-resource/</link>
-        <guid isPermaLink="true">http://karmeye.com/2014/10/12/what-is-a-resource/</guid>
-      </item>
-    
-      <item>
         <title>The third-party folder name</title>
         <description>&lt;p&gt;If you have a folder in Xcode called where you put all your third party dependencies, what do you call it?&lt;/p&gt;
 
