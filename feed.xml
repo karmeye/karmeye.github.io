@@ -7,6 +7,60 @@
     <atom:link href="http://karmeye.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>What Often Slips My Mind</title>
+        <description>&lt;h1 id=&quot;things-i-forget&quot;&gt;Things I Forget&lt;/h1&gt;
+
+&lt;h4 id=&quot;correct-order-to-declare-with-qualifier&quot;&gt;Correct Order to declare with qualifier&lt;/h4&gt;
+
+&lt;p&gt;From &lt;a href=&quot;https://developer.apple.com/library/ios/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html&quot;&gt;Transitioning to ARC Release Notes&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ClassName * qualifier variableName;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;MyClass * __weak myWeakReference;
+MyClass * __unsafe_unretained myUnsafeReference;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;local-variable-initialization&quot;&gt;Local Variable Initialization&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Local C type variables like &lt;code&gt;BOOL&lt;/code&gt; are not initialized.&lt;/li&gt;
+  &lt;li&gt;Instance variables of Objective-C objects are always set to 0 (or nil) when you allocate an object (this includes &lt;code&gt;BOOL&lt;/code&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://stackoverflow.com/questions/10022025/local-variables-set-to-nil-objective-c&quot;&gt;StackOverflow&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;ios-9-nsmutabledictionary-subscript-syntax-change&quot;&gt;iOS 9 NSMutableDictionary subscript syntax change&lt;/h4&gt;
+
+&lt;p&gt;From &lt;a href=&quot;https://developer.apple.com/library/mac/releasenotes/Foundation/RN-Foundation/&quot;&gt;Foundation Release Notes&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Following lines of code are now equivalent:&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;pre&gt;&lt;code&gt;[dictionary removeObjectForKey:@&quot;Key&quot;];
+dictionary[@&quot;Key&quot;] = nil;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;These new semantics exist only when building with the OS X 10.11 or iOS 9 SDKs. If your application’s deployment target is earlier operating system, then runtime support will be implicitly linked into your binary by Xcode to ensure the behavior works on any targeted operation system.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;racobserve&quot;&gt;RACObserve&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Signal is fired on the same thread is was changed.&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Tue, 10 Nov 2015 00:00:00 +0200</pubDate>
+        <link>http://karmeye.com/2015/11/10/what-often-slips-my-mind/</link>
+        <guid isPermaLink="true">http://karmeye.com/2015/11/10/what-often-slips-my-mind/</guid>
+      </item>
+    
+      <item>
         <title>UIDocumentPicker and NSFileCoordinator</title>
         <description>&lt;p&gt;When using &lt;code&gt;UIDocumentPickerViewController&lt;/code&gt; with either &lt;code&gt;UIDocumentPickerModeOpen&lt;/code&gt; or &lt;code&gt;UIDocumentPickerModeMove&lt;/code&gt; you are given access to files outside the app’s sandbox. You are then required to use a &lt;code&gt;NSFileCoordinator&lt;/code&gt; when accessing files since other processes might  potentially be accessing them simultaneously / concurrently.&lt;/p&gt;
 
@@ -125,7 +179,7 @@
 &lt;p&gt;Note that &lt;code&gt;startAccessingSecurityScopedResource&lt;/code&gt; and &lt;code&gt;stopAccessingSecurityScopedResource&lt;/code&gt; of &lt;code&gt;NSURL&lt;/code&gt; and &lt;code&gt;NSFileCoordinator&lt;/code&gt;’s &lt;code&gt;coordinateAccessWithIntents:queue:byAccessor&lt;/code&gt; are all new in iOS8.&lt;/p&gt;
 
 </description>
-        <pubDate>Thu, 18 Dec 2014 00:00:00 +0100</pubDate>
+        <pubDate>Thu, 18 Dec 2014 00:00:00 +0200</pubDate>
         <link>http://karmeye.com/2014/12/18/uidocumentpicker-nsfilecoordinator/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/12/18/uidocumentpicker-nsfilecoordinator/</guid>
       </item>
@@ -228,7 +282,7 @@ Much easier to set the &lt;code&gt;passthroughViews&lt;/code&gt; to &lt;code&gt;
 &lt;p&gt;&lt;a href=&quot;http://openradar.appspot.com/17406793&quot;&gt;Possibly related radar&lt;/a&gt;&lt;/p&gt;
 
 </description>
-        <pubDate>Thu, 20 Nov 2014 00:00:00 +0100</pubDate>
+        <pubDate>Thu, 20 Nov 2014 00:00:00 +0200</pubDate>
         <link>http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/</guid>
       </item>
@@ -247,7 +301,7 @@ put in there?&lt;/p&gt;
   &lt;li&gt;Resource bundles&lt;/li&gt;
 &lt;/ul&gt;
 </description>
-        <pubDate>Sun, 12 Oct 2014 00:00:00 +0200</pubDate>
+        <pubDate>Sun, 12 Oct 2014 00:00:00 +0300</pubDate>
         <link>http://karmeye.com/2014/10/12/what-is-a-resource/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/10/12/what-is-a-resource/</guid>
       </item>
@@ -263,7 +317,7 @@ put in there?&lt;/p&gt;
   &lt;li&gt;Vendor&lt;/li&gt;
 &lt;/ul&gt;
 </description>
-        <pubDate>Sun, 12 Oct 2014 00:00:00 +0200</pubDate>
+        <pubDate>Sun, 12 Oct 2014 00:00:00 +0300</pubDate>
         <link>http://karmeye.com/2014/10/12/naming-third-party-folder/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/10/12/naming-third-party-folder/</guid>
       </item>
@@ -310,7 +364,7 @@ put in there?&lt;/p&gt;
 &lt;span class=&quot;nl&quot;&gt;documentInteractionControllerDidDismissOptionsMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 </description>
-        <pubDate>Mon, 06 Oct 2014 00:00:00 +0200</pubDate>
+        <pubDate>Mon, 06 Oct 2014 00:00:00 +0300</pubDate>
         <link>http://karmeye.com/2014/10/06/uidocumentinteractioncontroller-ios-7-vs-8/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/10/06/uidocumentinteractioncontroller-ios-7-vs-8/</guid>
       </item>
@@ -446,7 +500,7 @@ Let’s conclude that all checks for the installed version on the device the app
 &lt;p&gt;&lt;a href=&quot;&quot;&gt;https://gist.github.com/steipete/6526860&lt;/a&gt;&lt;/p&gt;
 
 </description>
-        <pubDate>Sat, 04 Oct 2014 00:00:00 +0200</pubDate>
+        <pubDate>Sat, 04 Oct 2014 00:00:00 +0300</pubDate>
         <link>http://karmeye.com/2014/10/04/version-checking/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/10/04/version-checking/</guid>
       </item>
@@ -521,7 +575,7 @@ Let’s conclude that all checks for the installed version on the device the app
 &lt;/table&gt;
 
 </description>
-        <pubDate>Fri, 03 Oct 2014 00:00:00 +0200</pubDate>
+        <pubDate>Fri, 03 Oct 2014 00:00:00 +0300</pubDate>
         <link>http://karmeye.com/class-name-suffixes/</link>
         <guid isPermaLink="true">http://karmeye.com/class-name-suffixes/</guid>
       </item>

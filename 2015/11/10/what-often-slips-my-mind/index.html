@@ -1,0 +1,46 @@
+<h1 id="things-i-forget">Things I Forget</h1>
+
+<h4 id="correct-order-to-declare-with-qualifier">Correct Order to declare with qualifier</h4>
+
+<p>From <a href="https://developer.apple.com/library/ios/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html">Transitioning to ARC Release Notes</a></p>
+
+<pre><code>ClassName * qualifier variableName;
+</code></pre>
+
+<p>For example:</p>
+
+<pre><code>MyClass * __weak myWeakReference;
+MyClass * __unsafe_unretained myUnsafeReference;
+</code></pre>
+
+<h4 id="local-variable-initialization">Local Variable Initialization</h4>
+
+<ul>
+  <li>Local C type variables like <code>BOOL</code> are not initialized.</li>
+  <li>Instance variables of Objective-C objects are always set to 0 (or nil) when you allocate an object (this includes <code>BOOL</code>).</li>
+</ul>
+
+<p><a href="http://stackoverflow.com/questions/10022025/local-variables-set-to-nil-objective-c">StackOverflow</a></p>
+
+<h4 id="ios-9-nsmutabledictionary-subscript-syntax-change">iOS 9 NSMutableDictionary subscript syntax change</h4>
+
+<p>From <a href="https://developer.apple.com/library/mac/releasenotes/Foundation/RN-Foundation/">Foundation Release Notes</a></p>
+
+<blockquote>
+  <p>Following lines of code are now equivalent:</p>
+</blockquote>
+
+<pre><code>[dictionary removeObjectForKey:@"Key"];
+dictionary[@"Key"] = nil;
+</code></pre>
+
+<blockquote>
+  <p>These new semantics exist only when building with the OS X 10.11 or iOS 9 SDKs. If your application’s deployment target is earlier operating system, then runtime support will be implicitly linked into your binary by Xcode to ensure the behavior works on any targeted operation system.</p>
+</blockquote>
+
+<h4 id="racobserve">RACObserve</h4>
+
+<ul>
+  <li>Signal is fired on the same thread is was changed.</li>
+</ul>
+
