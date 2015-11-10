@@ -8,9 +8,7 @@
     
       <item>
         <title>What Often Slips My Mind</title>
-        <description>&lt;h1 id=&quot;things-i-forget&quot;&gt;Things I Forget&lt;/h1&gt;
-
-&lt;h4 id=&quot;correct-order-to-declare-with-qualifier&quot;&gt;Correct Order to declare with qualifier&lt;/h4&gt;
+        <description>&lt;h4 id=&quot;correct-order-to-declare-with-qualifier&quot;&gt;Correct Order to declare with qualifier&lt;/h4&gt;
 
 &lt;p&gt;From &lt;a href=&quot;https://developer.apple.com/library/ios/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html&quot;&gt;Transitioning to ARC Release Notes&lt;/a&gt;&lt;/p&gt;
 
