@@ -8,7 +8,7 @@
     
       <item>
         <title>What Often Slips My Mind</title>
-        <description>&lt;h4 id=&quot;correct-order-to-declare-with-qualifier&quot;&gt;Correct Order to declare with qualifier&lt;/h4&gt;
+        <description>&lt;h2 id=&quot;correct-order-to-declare-with-qualifier&quot;&gt;Correct Order to declare with qualifier&lt;/h2&gt;
 
 &lt;p&gt;From &lt;a href=&quot;https://developer.apple.com/library/ios/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html&quot;&gt;Transitioning to ARC Release Notes&lt;/a&gt;&lt;/p&gt;
 
@@ -21,7 +21,7 @@
 MyClass * __unsafe_unretained myUnsafeReference;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h4 id=&quot;local-variable-initialization&quot;&gt;Local Variable Initialization&lt;/h4&gt;
+&lt;h2 id=&quot;local-variable-initialization&quot;&gt;Local Variable Initialization&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;Local C type variables like &lt;code&gt;BOOL&lt;/code&gt; are not initialized.&lt;/li&gt;
@@ -30,7 +30,7 @@ MyClass * __unsafe_unretained myUnsafeReference;
 
 &lt;p&gt;&lt;a href=&quot;http://stackoverflow.com/questions/10022025/local-variables-set-to-nil-objective-c&quot;&gt;StackOverflow&lt;/a&gt;&lt;/p&gt;
 
-&lt;h4 id=&quot;ios-9-nsmutabledictionary-subscript-syntax-change&quot;&gt;iOS 9 NSMutableDictionary subscript syntax change&lt;/h4&gt;
+&lt;h2 id=&quot;ios-9-nsmutabledictionary-subscript-syntax-change&quot;&gt;iOS 9 NSMutableDictionary subscript syntax change&lt;/h2&gt;
 
 &lt;p&gt;From &lt;a href=&quot;https://developer.apple.com/library/mac/releasenotes/Foundation/RN-Foundation/&quot;&gt;Foundation Release Notes&lt;/a&gt;&lt;/p&gt;
 
@@ -46,10 +46,10 @@ dictionary[@&quot;Key&quot;] = nil;
   &lt;p&gt;These new semantics exist only when building with the OS X 10.11 or iOS 9 SDKs. If your application’s deployment target is earlier operating system, then runtime support will be implicitly linked into your binary by Xcode to ensure the behavior works on any targeted operation system.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;h4 id=&quot;racobserve&quot;&gt;RACObserve&lt;/h4&gt;
+&lt;h2 id=&quot;reactive-cocoa&quot;&gt;Reactive Cocoa&lt;/h2&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Signal is fired on the same thread is was changed.&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;RACObserve&lt;/code&gt;: Signal is fired on the same thread is was changed.&lt;/li&gt;
 &lt;/ul&gt;
 
 </description>

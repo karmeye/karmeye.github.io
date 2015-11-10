@@ -12,7 +12,7 @@
     <link rel="alternate" type="application/rss+xml" title="RSS Feed for Karmeye" href="/feed.xml" />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/style.css?201511101927" type="text/css">
+    <link rel="stylesheet" href="/css/style.css?201511101930" type="text/css">
 
     <!-- Fonts -->
     <link href='//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic' rel='stylesheet' type='text/css'>
@@ -108,7 +108,7 @@
 </div>
 
 <article class="post-content">
-  <h4 id="correct-order-to-declare-with-qualifier">Correct Order to declare with qualifier</h4>
+  <h2 id="correct-order-to-declare-with-qualifier">Correct Order to declare with qualifier</h2>
 
 <p>From <a href="https://developer.apple.com/library/ios/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html">Transitioning to ARC Release Notes</a></p>
 
@@ -121,7 +121,7 @@
 MyClass * __unsafe_unretained myUnsafeReference;
 </code></pre>
 
-<h4 id="local-variable-initialization">Local Variable Initialization</h4>
+<h2 id="local-variable-initialization">Local Variable Initialization</h2>
 
 <ul>
   <li>Local C type variables like <code>BOOL</code> are not initialized.</li>
@@ -130,7 +130,7 @@ MyClass * __unsafe_unretained myUnsafeReference;
 
 <p><a href="http://stackoverflow.com/questions/10022025/local-variables-set-to-nil-objective-c">StackOverflow</a></p>
 
-<h4 id="ios-9-nsmutabledictionary-subscript-syntax-change">iOS 9 NSMutableDictionary subscript syntax change</h4>
+<h2 id="ios-9-nsmutabledictionary-subscript-syntax-change">iOS 9 NSMutableDictionary subscript syntax change</h2>
 
 <p>From <a href="https://developer.apple.com/library/mac/releasenotes/Foundation/RN-Foundation/">Foundation Release Notes</a></p>
 
@@ -146,10 +146,10 @@ dictionary[@"Key"] = nil;
   <p>These new semantics exist only when building with the OS X 10.11 or iOS 9 SDKs. If your application’s deployment target is earlier operating system, then runtime support will be implicitly linked into your binary by Xcode to ensure the behavior works on any targeted operation system.</p>
 </blockquote>
 
-<h4 id="racobserve">RACObserve</h4>
+<h2 id="reactive-cocoa">Reactive Cocoa</h2>
 
 <ul>
-  <li>Signal is fired on the same thread is was changed.</li>
+  <li><code>RACObserve</code>: Signal is fired on the same thread is was changed.</li>
 </ul>
 
 
