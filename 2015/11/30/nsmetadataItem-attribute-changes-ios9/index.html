@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>What Often Slips My Mind &#8211; Karmeye</title>
+    <title>Changes to NSMetadataItem’s Attributes in iOS 9 &#8211; Karmeye</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Sometimes I suddenly forget these things while coding and I have to look them up.">
+    <meta name="description" content="dyn.ah62d4vv4ge8u">
     <meta name="author" content="Karmeye">
     <meta name="keywords" content="">
-    <link rel="canonical" href="http://karmeye.com/2015/11/10/what-often-slips-my-mind/">
+    <link rel="canonical" href="http://karmeye.com/2015/11/30/nsmetadataItem-attribute-changes-ios9/">
     <link rel="alternate" type="application/rss+xml" title="RSS Feed for Karmeye" href="/feed.xml" />
 
     <!-- Custom CSS -->
@@ -24,9 +24,9 @@
     <!-- From: https://github.com/mmistakes/hpstr-jekyll-theme/blob/master/_includes/head.html -->
     <meta property="og:locale" content="en_US">
     <meta property="og:type" content="article">
-    <meta property="og:title" content="What Often Slips My Mind">
+    <meta property="og:title" content="Changes to NSMetadataItem’s Attributes in iOS 9">
     <meta property="og:description" content="iOS app development since 1859">
-    <meta property="og:url" content="http://karmeye.com/2015/11/10/what-often-slips-my-mind/">
+    <meta property="og:url" content="http://karmeye.com/2015/11/30/nsmetadataItem-attribute-changes-ios9/">
     <meta property="og:site_name" content="Karmeye">
 
     <!-- Twitter Card -->
@@ -34,9 +34,9 @@
     
         <meta name="twitter:site" content="@karmeye" />
     
-    <meta name="twitter:title" content="What Often Slips My Mind" />
-    <meta name="twitter:description" content="Sometimes I suddenly forget these things while coding and I have to look them up." />
-    <meta name="twitter:url" content="http://karmeye.com/2015/11/10/what-often-slips-my-mind/" />
+    <meta name="twitter:title" content="Changes to NSMetadataItem’s Attributes in iOS 9" />
+    <meta name="twitter:description" content="dyn.ah62d4vv4ge8u" />
+    <meta name="twitter:url" content="http://karmeye.com/2015/11/30/nsmetadataItem-attribute-changes-ios9/" />
 
     <!-- Icons -->
     <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
@@ -94,11 +94,9 @@
         
 
 
-
-
 <div class="post-header mb2">
-  <h1>What Often Slips My Mind</h1>
-  <span class="post-meta">Nov 10, 2015</span><br>
+  <h1>Changes to NSMetadataItem’s Attributes in iOS 9</h1>
+  <span class="post-meta">Nov 30, 2015</span><br>
     
   <span class="post-meta small">
   
@@ -108,49 +106,56 @@
 </div>
 
 <article class="post-content">
-  <h2 id="correct-order-to-declare-with-qualifier">Correct Order to declare with qualifier</h2>
+  <h2 id="folder-detection">Folder Detection</h2>
 
-<p>From <a href="https://developer.apple.com/library/ios/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html">Transitioning to ARC Release Notes</a></p>
+<p>In iOS 8 I used the <code>NSMetadataItemContentTypeKey</code> key in order to detect whether an <code>NSMetadataItem</code> was a folder or not:</p>
 
-<pre><code>ClassName * qualifier variableName;
+<pre><code>+ (BOOL)isFolder:(NSMetadataItem*)item
+{ 
+    NSString *contentType = [item valueForAttribute:NSMetadataItemContentTypeKey];
+
+    return contentType ? [contentType isEqualToString:(__bridge NSString *)kUTTypeFolder] : NO;
+}
 </code></pre>
 
-<p>For example:</p>
+<p>The <code>kUTTypeFolder</code> constant above corresponds to the UTI string <code>public.folder</code>.</p>
 
-<pre><code>MyClass * __weak myWeakReference;
-MyClass * __unsafe_unretained myUnsafeReference;
+<p>In iOS 9 this no longer works and the value of <code>NSMetadataItemContentTypeKey</code> is not <code>public.folder</code> but rather strange: <code>dyn.ah62d4vv4ge8u</code>. <br />
+Content types for documents such as PDFs and images still return the expected values.</p>
+
+<p>To fix this method in iOS 9 I used the <code>NSMetadataItemContentTypeTreeKey</code> key instead:</p>
+
+<pre><code>+ (BOOL)isFolder:(NSMetadataItem*)item
+{ 
+   NSArray *contentTypeTree = [self valueForAttribute:NSMetadataItemContentTypeTreeKey];
+    APPAssertDebugKindOfClass(contentTypeTree, [NSArray class]);
+
+    for (NSString *value in contentTypeTree) {
+        if ([value isEqualToString:(__bridge NSString *)kUTTypeFolder]) {
+            return YES;
+        }
+    }
+}
 </code></pre>
 
-<h2 id="local-variable-initialization">Local Variable Initialization</h2>
+<p>In both iOS 8 and 9 <code>NSMetadataItemContentTypeTreeKey</code> returns an array with all UTIs the <code>NSMetadataItem</code> corresponds to:</p>
 
-<ul>
-  <li>Local C type variables like <code>BOOL</code> are not initialized.</li>
-  <li>Instance variables of Objective-C objects are always set to 0 (or nil) when you allocate an object (this includes <code>BOOL</code>).</li>
-</ul>
-
-<p><a href="http://stackoverflow.com/questions/10022025/local-variables-set-to-nil-objective-c">StackOverflow</a></p>
-
-<h2 id="ios-9-nsmutabledictionary-subscript-syntax-change">iOS 9 NSMutableDictionary subscript syntax change</h2>
-
-<p>From <a href="https://developer.apple.com/library/mac/releasenotes/Foundation/RN-Foundation/">Foundation Release Notes</a></p>
-
-<blockquote>
-  <p>Following lines of code are now equivalent:</p>
-</blockquote>
-
-<pre><code>[dictionary removeObjectForKey:@"Key"];
-dictionary[@"Key"] = nil;
+<pre><code>kMDItemContentTypeTree = (
+        "public.folder",
+        "public.directory",
+        "public.item"
+    )
 </code></pre>
 
-<blockquote>
-  <p>These new semantics exist only when building with the OS X 10.11 or iOS 9 SDKs. If your application’s deployment target is earlier operating system, then runtime support will be implicitly linked into your binary by Xcode to ensure the behavior works on any targeted operation system.</p>
-</blockquote>
+<h2 id="detect-if-download-has-been-requested">Detect if Download Has Been Requested</h2>
 
-<h2 id="reactive-cocoa">Reactive Cocoa</h2>
+<p>For each <code>NSMetadataItem</code> there is a certain state in which an item has been requested for download but is still waiting for download to start. To detect this I use the <code>NSMetadataUbiquitousItemDownloadRequestedKey</code> which return a <code>NSNumber</code> boxed <code>Bool</code>.</p>
 
-<ul>
-  <li><code>RACObserve</code>: Signal is fired on the same thread is was changed.</li>
-</ul>
+<p><code>NSMetadataUbiquitousItemDownloadRequestedKey</code> is not actually in the <code>NSMetadataItem</code> documentation, but is available in the public header together with the rest of the keys.</p>
+
+<p>On iOS 8 this key is not present int the attribute dictionary so calling <code>valueForAttribute:</code> on <code>NSMetadataItem</code> on iOS 8 with this key returns <code>nil</code>. At least this is the case with iOS 8.4; could be that it was in fact present in earlier versions of iOS 8 (otherwise, why would I have implemented it?).</p>
+
+<p>On iOS 9 however, this key is back and it works as expected. That is, if you expect the value to be <code>YES</code> even after the download of the <code>NSMetadataItem</code> has completed.</p>
 
 
 </article>
