@@ -72,7 +72,7 @@ Content types for documents such as PDFs and images still return the expected va
       </item>
     
       <item>
-        <title>What Often Slips My Mind</title>
+        <title>In Case Forgotten</title>
         <description>&lt;h2 id=&quot;correct-order-to-declare-with-qualifier&quot;&gt;Correct Order to declare with qualifier&lt;/h2&gt;
 
 &lt;p&gt;From &lt;a href=&quot;https://developer.apple.com/library/ios/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html&quot;&gt;Transitioning to ARC Release Notes&lt;/a&gt;&lt;/p&gt;
@@ -119,8 +119,8 @@ dictionary[@&quot;Key&quot;] = nil;
 
 </description>
         <pubDate>Tue, 10 Nov 2015 00:00:00 +0200</pubDate>
-        <link>http://karmeye.com/2015/11/10/what-often-slips-my-mind/</link>
-        <guid isPermaLink="true">http://karmeye.com/2015/11/10/what-often-slips-my-mind/</guid>
+        <link>http://karmeye.com/2015/11/10/in-case-forgotten/</link>
+        <guid isPermaLink="true">http://karmeye.com/2015/11/10/in-case-forgotten/</guid>
       </item>
     
       <item>
