@@ -12,7 +12,7 @@
     <link rel="alternate" type="application/rss+xml" title="RSS Feed for Karmeye" href="/feed.xml" />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/style.css?201511301138" type="text/css">
+    <link rel="stylesheet" href="/css/style.css?201511301146" type="text/css">
 
     <!-- Fonts -->
     <link href='//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic' rel='stylesheet' type='text/css'>
@@ -153,7 +153,7 @@ Content types for documents such as PDFs and images still return the expected va
 
 <h2 id="detect-if-download-has-been-requested">Detect if Download Has Been Requested</h2>
 
-<p>For each <code>NSMetadataItem</code> there is a certain state in which an item has been requested for download but is still waiting for download to start, i.e. the vallue for <code>NSMetadataUbiquitousItemIsDownloadingKey</code> is <code>NO</code>. To detect this I use the <code>NSMetadataUbiquitousItemDownloadRequestedKey</code>, which returns a <code>NSNumber</code>-boxed <code>Bool</code>.</p>
+<p>For each <code>NSMetadataItem</code> there is a certain state in which an item has been requested for download but is still waiting for download to start, i.e. the vallue for <code>NSMetadataUbiquitousItemIsDownloadingKey</code> is <code>NO</code>. To detect this one can use the <code>NSMetadataUbiquitousItemDownloadRequestedKey</code>, which returns a <code>NSNumber</code>-boxed <code>Bool</code>.</p>
 
 <p><code>NSMetadataUbiquitousItemDownloadRequestedKey</code> is not actually in the <code>NSMetadataItem</code> documentation, but is available in the public header together with the rest of the keys.</p>
 

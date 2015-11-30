@@ -55,7 +55,7 @@ Content types for documents such as PDFs and images still return the expected va
 
 &lt;h2 id=&quot;detect-if-download-has-been-requested&quot;&gt;Detect if Download Has Been Requested&lt;/h2&gt;
 
-&lt;p&gt;For each &lt;code&gt;NSMetadataItem&lt;/code&gt; there is a certain state in which an item has been requested for download but is still waiting for download to start, i.e. the vallue for &lt;code&gt;NSMetadataUbiquitousItemIsDownloadingKey&lt;/code&gt; is &lt;code&gt;NO&lt;/code&gt;. To detect this I use the &lt;code&gt;NSMetadataUbiquitousItemDownloadRequestedKey&lt;/code&gt;, which returns a &lt;code&gt;NSNumber&lt;/code&gt;-boxed &lt;code&gt;Bool&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;For each &lt;code&gt;NSMetadataItem&lt;/code&gt; there is a certain state in which an item has been requested for download but is still waiting for download to start, i.e. the vallue for &lt;code&gt;NSMetadataUbiquitousItemIsDownloadingKey&lt;/code&gt; is &lt;code&gt;NO&lt;/code&gt;. To detect this one can use the &lt;code&gt;NSMetadataUbiquitousItemDownloadRequestedKey&lt;/code&gt;, which returns a &lt;code&gt;NSNumber&lt;/code&gt;-boxed &lt;code&gt;Bool&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;&lt;code&gt;NSMetadataUbiquitousItemDownloadRequestedKey&lt;/code&gt; is not actually in the &lt;code&gt;NSMetadataItem&lt;/code&gt; documentation, but is available in the public header together with the rest of the keys.&lt;/p&gt;
 
