@@ -8,7 +8,9 @@
     
       <item>
         <title>Changes to NSMetadataItem’s Attributes in iOS 9</title>
-        <description>&lt;h2 id=&quot;folder-detection&quot;&gt;Folder Detection&lt;/h2&gt;
+        <description>&lt;p&gt;As iOS 9 came by, some minor issues arose in an app the lets it’s users browse the app’s iCloud Drive folder from within the app itself.&lt;/p&gt;
+
+&lt;h2 id=&quot;folder-detection&quot;&gt;Folder Detection&lt;/h2&gt;
 
 &lt;p&gt;In iOS 8 I used the &lt;code&gt;NSMetadataItemContentTypeKey&lt;/code&gt; key in order to detect whether an &lt;code&gt;NSMetadataItem&lt;/code&gt; was a folder or not:&lt;/p&gt;
 
@@ -342,22 +344,6 @@ Much easier to set the &lt;code&gt;passthroughViews&lt;/code&gt; to &lt;code&gt;
         <pubDate>Thu, 20 Nov 2014 00:00:00 +0200</pubDate>
         <link>http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/</link>
         <guid isPermaLink="true">http://karmeye.com/2014/11/20/ios8-popovers-and-passthroughviews/</guid>
-      </item>
-    
-      <item>
-        <title>The third-party folder name</title>
-        <description>&lt;p&gt;If you have a folder in Xcode called where you put all your third party dependencies, what do you call it?&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;3rdParty&lt;/li&gt;
-  &lt;li&gt;External&lt;/li&gt;
-  &lt;li&gt;Pods&lt;/li&gt;
-  &lt;li&gt;Vendor&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Sun, 12 Oct 2014 00:00:00 +0300</pubDate>
-        <link>http://karmeye.com/2014/10/12/naming-third-party-folder/</link>
-        <guid isPermaLink="true">http://karmeye.com/2014/10/12/naming-third-party-folder/</guid>
       </item>
     
       <item>
