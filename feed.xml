@@ -63,6 +63,16 @@ Content types for documents such as PDFs and images still return the expected va
 
 &lt;p&gt;On iOS 9 however, this key is back and it works as expected. That is, if you expect the value to be &lt;code&gt;YES&lt;/code&gt; even after the download of the &lt;code&gt;NSMetadataItem&lt;/code&gt; has completed.&lt;/p&gt;
 
+&lt;h2 id=&quot;tidbit&quot;&gt;Tidbit&lt;/h2&gt;
+
+&lt;p&gt;Also a new interesting key:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;BRMetadataItemFileObjectIdentifierKey&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This seems to hold an identifier for the &lt;code&gt;NSMetadataItem&lt;/code&gt;, for example &lt;code&gt;4294989055&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Searching Google for this key gives voidness and given the “BR” prefix, let’s leave that one alone.&lt;/p&gt;
+
 </description>
         <pubDate>Mon, 30 Nov 2015 00:00:00 +0200</pubDate>
         <link>http://karmeye.com/2015/11/30/nsmetadataItem-attribute-changes-ios9/</link>
