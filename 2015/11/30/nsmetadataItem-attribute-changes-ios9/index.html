@@ -12,7 +12,7 @@
     <link rel="alternate" type="application/rss+xml" title="RSS Feed for Karmeye" href="/feed.xml" />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/style.css?201511301100" type="text/css">
+    <link rel="stylesheet" href="/css/style.css?201511301120" type="text/css">
 
     <!-- Fonts -->
     <link href='//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic' rel='stylesheet' type='text/css'>
@@ -155,11 +155,11 @@ Content types for documents such as PDFs and images still return the expected va
 
 <h2 id="detect-if-download-has-been-requested">Detect if Download Has Been Requested</h2>
 
-<p>For each <code>NSMetadataItem</code> there is a certain state in which an item has been requested for download but is still waiting for download to start. To detect this I use the <code>NSMetadataUbiquitousItemDownloadRequestedKey</code> which return a <code>NSNumber</code> boxed <code>Bool</code>.</p>
+<p>For each <code>NSMetadataItem</code> there is a certain state in which an item has been requested for download but is still waiting for download to start, i.e. the vallue for <code>NSMetadataUbiquitousItemIsDownloadingKey</code> is <code>NO</code>. To detect this I use the <code>NSMetadataUbiquitousItemDownloadRequestedKey</code>, which returns a <code>NSNumber</code>-boxed <code>Bool</code>.</p>
 
 <p><code>NSMetadataUbiquitousItemDownloadRequestedKey</code> is not actually in the <code>NSMetadataItem</code> documentation, but is available in the public header together with the rest of the keys.</p>
 
-<p>On iOS 8 this key is not present int the attribute dictionary so calling <code>valueForAttribute:</code> on <code>NSMetadataItem</code> on iOS 8 with this key returns <code>nil</code>. At least this is the case with iOS 8.4; could be that it was in fact present in earlier versions of iOS 8 (otherwise, why would I have implemented it?).</p>
+<p>On iOS 8 this key is not present in the attribute dictionary so calling <code>valueForAttribute:</code> on <code>NSMetadataItem</code> on iOS 8 with this key returns <code>nil</code>. At least this is the case with iOS 8.4; could be that it was in fact present in earlier versions of iOS 8 (otherwise, why would I have implemented it?).</p>
 
 <p>On iOS 9 however, this key is back and it works as expected. That is, if you expect the value to be <code>YES</code> even after the download of the <code>NSMetadataItem</code> has completed.</p>
 

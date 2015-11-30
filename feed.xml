@@ -57,11 +57,11 @@ Content types for documents such as PDFs and images still return the expected va
 
 &lt;h2 id=&quot;detect-if-download-has-been-requested&quot;&gt;Detect if Download Has Been Requested&lt;/h2&gt;
 
-&lt;p&gt;For each &lt;code&gt;NSMetadataItem&lt;/code&gt; there is a certain state in which an item has been requested for download but is still waiting for download to start. To detect this I use the &lt;code&gt;NSMetadataUbiquitousItemDownloadRequestedKey&lt;/code&gt; which return a &lt;code&gt;NSNumber&lt;/code&gt; boxed &lt;code&gt;Bool&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;For each &lt;code&gt;NSMetadataItem&lt;/code&gt; there is a certain state in which an item has been requested for download but is still waiting for download to start, i.e. the vallue for &lt;code&gt;NSMetadataUbiquitousItemIsDownloadingKey&lt;/code&gt; is &lt;code&gt;NO&lt;/code&gt;. To detect this I use the &lt;code&gt;NSMetadataUbiquitousItemDownloadRequestedKey&lt;/code&gt;, which returns a &lt;code&gt;NSNumber&lt;/code&gt;-boxed &lt;code&gt;Bool&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;&lt;code&gt;NSMetadataUbiquitousItemDownloadRequestedKey&lt;/code&gt; is not actually in the &lt;code&gt;NSMetadataItem&lt;/code&gt; documentation, but is available in the public header together with the rest of the keys.&lt;/p&gt;
 
-&lt;p&gt;On iOS 8 this key is not present int the attribute dictionary so calling &lt;code&gt;valueForAttribute:&lt;/code&gt; on &lt;code&gt;NSMetadataItem&lt;/code&gt; on iOS 8 with this key returns &lt;code&gt;nil&lt;/code&gt;. At least this is the case with iOS 8.4; could be that it was in fact present in earlier versions of iOS 8 (otherwise, why would I have implemented it?).&lt;/p&gt;
+&lt;p&gt;On iOS 8 this key is not present in the attribute dictionary so calling &lt;code&gt;valueForAttribute:&lt;/code&gt; on &lt;code&gt;NSMetadataItem&lt;/code&gt; on iOS 8 with this key returns &lt;code&gt;nil&lt;/code&gt;. At least this is the case with iOS 8.4; could be that it was in fact present in earlier versions of iOS 8 (otherwise, why would I have implemented it?).&lt;/p&gt;
 
 &lt;p&gt;On iOS 9 however, this key is back and it works as expected. That is, if you expect the value to be &lt;code&gt;YES&lt;/code&gt; even after the download of the &lt;code&gt;NSMetadataItem&lt;/code&gt; has completed.&lt;/p&gt;
 
@@ -73,7 +73,9 @@ Content types for documents such as PDFs and images still return the expected va
     
       <item>
         <title>In Case Forgotten</title>
-        <description>&lt;h2 id=&quot;correct-order-to-declare-with-qualifier&quot;&gt;Correct Order to declare with qualifier&lt;/h2&gt;
+        <description>&lt;p&gt;Surprisingly, what’s often repeated while coding, can suddenly be forgotten. A short collected list of these things to save time for these occations.&lt;/p&gt;
+
+&lt;h2 id=&quot;correct-order-to-declare-with-qualifier&quot;&gt;Correct Order to declare with qualifier&lt;/h2&gt;
 
 &lt;p&gt;From &lt;a href=&quot;https://developer.apple.com/library/ios/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html&quot;&gt;Transitioning to ARC Release Notes&lt;/a&gt;&lt;/p&gt;
 
