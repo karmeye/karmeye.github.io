@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Changes to NSMetadataItem’s Attributes in iOS 9 &#8211; Karmeye</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="As iOS 9 came by, two minor issues arose for an app that lets it’s users to browse the app’s iCloud Drive folder from within the app itself.">
+    <meta name="description" content="As iOS 9 came by, two minor bugs appeared in an app that lets it’s users browse the app’s iCloud Drive folder from within the app itself.">
     <meta name="author" content="Karmeye">
     <meta name="keywords" content="">
     <link rel="canonical" href="http://karmeye.com/2015/11/30/nsmetadataItem-attribute-changes-ios9/">
     <link rel="alternate" type="application/rss+xml" title="RSS Feed for Karmeye" href="/feed.xml" />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/style.css?201511301031" type="text/css">
+    <link rel="stylesheet" href="/css/style.css?201511301044" type="text/css">
 
     <!-- Fonts -->
     <link href='//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic' rel='stylesheet' type='text/css'>
@@ -35,7 +35,7 @@
         <meta name="twitter:site" content="@karmeye" />
     
     <meta name="twitter:title" content="Changes to NSMetadataItem’s Attributes in iOS 9" />
-    <meta name="twitter:description" content="As iOS 9 came by, two minor issues arose for an app that lets it’s users to browse the app’s iCloud Drive folder from within the app itself." />
+    <meta name="twitter:description" content="As iOS 9 came by, two minor bugs appeared in an app that lets it’s users browse the app’s iCloud Drive folder from within the app itself." />
     <meta name="twitter:url" content="http://karmeye.com/2015/11/30/nsmetadataItem-attribute-changes-ios9/" />
 
     <!-- Icons -->
@@ -100,13 +100,19 @@
     
   <span class="post-meta small">
   
-    1 minute read
+    2 minute read
   
   </span>
 </div>
 
 <article class="post-content">
-  <p>As iOS 9 came by, two minor issues arose for an app that lets it’s users to browse the app’s iCloud Drive folder from within the app itself.</p>
+  <p>As iOS 9 came by, two bugs appeared in an app that lets it’s users browse the app’s iCloud Drive folder from within the app itself. One related to detecting whether an <code>NSMetadatItem</code> is a folder or not; the other one related to whether a non-downloaded item was waiting to be downloaded.</p>
+
+<p>Minor changes in <code>NSMetadataItem</code>´s attribute keys and values that caused these bugs.</p>
+
+<p>These were easily solved, all be it with one insignificant loose hanging thread:</p>
+
+<p>What is <code>dyn.ah62d4vv4ge8u</code>?</p>
 
 <h2 id="folder-detection">Folder Detection</h2>
 
