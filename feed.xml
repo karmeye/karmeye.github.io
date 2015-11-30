@@ -10,9 +10,7 @@
         <title>Changes to NSMetadataItem’s Attributes in iOS 9</title>
         <description>&lt;p&gt;As iOS 9 came by, two bugs appeared in an app that lets it’s users browse the app’s iCloud Drive folder from within the app itself. One related to detecting whether an &lt;code&gt;NSMetadatItem&lt;/code&gt; is a folder or not; the other one related to whether a non-downloaded item was waiting to be downloaded.&lt;/p&gt;
 
-&lt;p&gt;Minor changes in &lt;code&gt;NSMetadataItem&lt;/code&gt;´s attribute keys and values that caused these bugs.&lt;/p&gt;
-
-&lt;p&gt;These were easily solved, all be it with one insignificant loose hanging thread:&lt;/p&gt;
+&lt;p&gt;Turned out that minor changes in &lt;code&gt;NSMetadataItem&lt;/code&gt;´s attribute keys and values caused these bugs, which were easily solved — all be it with one insignificant loose hanging thread:&lt;/p&gt;
 
 &lt;p&gt;What is &lt;code&gt;dyn.ah62d4vv4ge8u&lt;/code&gt;?&lt;/p&gt;
 
@@ -37,7 +35,7 @@ Content types for documents such as PDFs and images still return the expected va
 
 &lt;pre&gt;&lt;code&gt;+ (BOOL)isFolder:(NSMetadataItem*)item
 { 
-   NSArray *contentTypeTree = [self valueForAttribute:NSMetadataItemContentTypeTreeKey];
+    NSArray *contentTypeTree = [self valueForAttribute:NSMetadataItemContentTypeTreeKey];
     APPAssertDebugKindOfClass(contentTypeTree, [NSArray class]);
 
     for (NSString *value in contentTypeTree) {
