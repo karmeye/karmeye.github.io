@@ -8,7 +8,7 @@
     
       <item>
         <title>Changes to NSMetadataItem’s Attributes in iOS 9</title>
-        <description>&lt;p&gt;As iOS 9 came by, some minor issues arose in an app the lets it’s users browse the app’s iCloud Drive folder from within the app itself.&lt;/p&gt;
+        <description>&lt;p&gt;As iOS 9 came by, two minor issues arose for an app that lets it’s users to browse the app’s iCloud Drive folder from within the app itself.&lt;/p&gt;
 
 &lt;h2 id=&quot;folder-detection&quot;&gt;Folder Detection&lt;/h2&gt;
 
