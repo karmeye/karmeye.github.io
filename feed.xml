@@ -71,7 +71,7 @@ Content types for documents such as PDFs and images still return the expected va
 
 &lt;p&gt;This seems to hold an identifier for the &lt;code&gt;NSMetadataItem&lt;/code&gt;, for example &lt;code&gt;4294989055&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Searching Google for this key gives voidness and given the “BR” prefix, let’s leave that one alone.&lt;/p&gt;
+&lt;p&gt;Searching Google for this key gives voidness, and given the “BR” prefix — let’s leave that one alone.&lt;/p&gt;
 
 </description>
         <pubDate>Mon, 30 Nov 2015 00:00:00 +0200</pubDate>
