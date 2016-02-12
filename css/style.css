@@ -18,7 +18,7 @@
 /* Basscss Base Buttons */
 button,
 .button {
-  font-family: "Lato", "Helvetica Neue", Helvetica, sans-serif;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, sans-serif;
   font-size: inherit;
   font-weight: normal;
   text-decoration: none;
@@ -109,7 +109,7 @@ svg {
 
 /* Basscss Base Typography */
 body {
-  font-family: "Helvetica Neue", "PT Serif", Georgia, "Times New Roman", serif;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, "PT Serif", Georgia, "Times New Roman", serif;
   line-height: 1.5;
   font-size: 100%; }
 
@@ -119,7 +119,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Lato", "Helvetica Neue", Helvetica, sans-serif;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, sans-serif;
   font-weight: 900;
   line-height: 1.25;
   margin-top: 1em;
@@ -140,7 +140,7 @@ ul {
 pre,
 code,
 samp {
-  font-family: "Source Code Pro", Consolas, monospace;
+  font-family: monospace, "Source Code Pro", Consolas;
   font-size: inherit; }
 
 pre {
@@ -166,7 +166,7 @@ blockquote p {
 
 h1,
 .h1 {
-  font-size: 2rem; }
+  font-size: 2.998rem; }
 
 h2,
 .h2 {
@@ -218,17 +218,51 @@ h6,
 .highlight {
   -webkit-text-size-adjust: none; }
 
+.highlight .c,
+.highlight .cs,
+.highlight .cm,
+.highlight .cp,
 .highlight .c1 {
   color: #777;
   font-style: italic; }
 
 .highlight .k,
+.highlight .kc,
+.highlight .kd,
+.highlight .kn,
+.highlight .kr,
+.highlight .kt,
 .highlight .kp {
+  color: #00369f; }
+
+.highlight .na,
+.highlight .nb,
+.highlight .nc,
+.highlight .no,
+.highlight .nd,
+.highlight .ni,
+.highlight .ne,
+.highlight .nf,
+.highlight .nl,
+.highlight .nn,
+.highlight .nx {
   color: #333; }
 
-.highlight .mi {
-  color: #00ab37; }
+.highlight .mi,
+.highlight .il {
+  color: #009f06; }
 
+.highlight .s,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .s2,
+.highlight .s3,
+.highlight .sh,
+.highlight .si,
+.highlight .sx,
+.highlight .sr,
+.highlight .ss,
 .highlight .s1 {
   color: #f95020; }
 
@@ -250,10 +284,10 @@ h6,
   font-weight: normal; }
 
 .highlight .nb {
-  color: #00ab37; }
+  color: #009f06; }
 
 .highlight .sr {
-  color: #00ab37; }
+  color: #009f06; }
 
 .highlight .ss {
   color: #f92080; }
@@ -590,8 +624,11 @@ html, body {
   min-height: 100%; }
 
 img {
-  width: auto;
   max-width: 100%; }
+
+em img {
+  max-width: 100%;
+  margin-left: 0; }
 
 body {
   box-sizing: border-box;
@@ -599,14 +636,40 @@ body {
   -webkit-box-sizing: border-box; }
 
 a {
-  color: #0076df; }
+  color: #0076df;
+  /*background-image: linear-gradient(to top,
+    rgba(0,0,0,0) 13%,
+    rgba($link-color,.8) 13%,
+    rgba($link-color,.8) 18%,
+    rgba(0,0,0,0) 17%
+  );
+  text-shadow: white 1px 0px 0px, white -1px 0px 0px;*/ }
 
 a:hover,
 a:focus,
 a:active {
   border: 0;
   color: #000a13;
-  text-decoration: none; }
+  text-decoration: none;
+  /*background-image: linear-gradient(to top,
+    rgba(0,0,0,0) 13%,
+    rgba($link-hover-color,.8) 13%,
+    rgba($link-hover-color,.8) 17%,
+    rgba(0,0,0,0) 17%
+  );
+  text-shadow: white 1px 0px 0px, white -1px 0px 0px;*/ }
+
+button,
+.button {
+  text-shadow: none;
+  background-image: none; }
+
+.button:hover,
+.button:focus,
+.button:active {
+  color: white;
+  text-shadow: none;
+  background-image: none; }
 
 .left {
   float: left; }
@@ -628,7 +691,7 @@ pre code {
 
 pre,
 code {
-  font-family: "Source Code Pro", Consolas, monospace; }
+  font-family: monospace, "Source Code Pro", Consolas; }
 
 code {
   color: #7a7a7a; }
@@ -650,6 +713,9 @@ pre {
   overflow-x: auto;
   word-break: inherit;
   word-wrap: inherit; }
+
+pre a {
+  background-image: none; }
 
 pre a::before {
   content: counter(line-numbering);
@@ -685,7 +751,7 @@ textarea,
 fieldset {
   font-size: 1rem;
   margin-top: 0;
-  margin-bottom: 0.5rem, 0.5rem; }
+  margin-bottom: 0.5rem; }
 
 input[type=text],
 input[type=datetime],
@@ -783,6 +849,11 @@ small,
 .small {
   font-size: 0.707rem; }
 
+sup {
+  position: relative;
+  vertical-align: middle;
+  top: -0.9ex; }
+
 .site-header {
   padding-top: 0.5rem;
   padding-bottom: 1rem; }
@@ -790,7 +861,8 @@ small,
 .site-header a {
   color: #333;
   font-size: 1.25rem;
-  font-weight: 300; }
+  font-weight: 300;
+  background-image: none; }
 
 .site-header .site-title {
   font-size: 1.5rem; }
@@ -822,10 +894,6 @@ small,
 
 .site-header .site-nav {
   text-align: center; }
-
-.social-icons .left, .social-icons .right {
-  text-align: center;
-  float: none; }
 
 /*
   Table styles copied from Bootstrap
@@ -903,45 +971,23 @@ Copyright (c) 2014 Daniel Eden
   -webkit-animation-name: fadeInDown;
   animation-name: fadeInDown; }
 
-/*
-  Table styles copied from Bootstrap
-  Copyright (c) 2013 Twitter, Inc
-*/
-table {
-  width: 100%;
-  max-width: 100%;
-  margin-bottom: 1.5;
-  font-size: 1.125rem; }
-  table > thead > tr > th,
-  table > thead > tr > td,
-  table > tbody > tr > th,
-  table > tbody > tr > td,
-  table > tfoot > tr > th,
-  table > tfoot > tr > td {
-    padding: 12px;
-    line-height: 1.2;
-    vertical-align: top;
-    border-top: 1px solid #333; }
-  table > thead > tr > th {
-    vertical-align: bottom;
-    border-bottom: 2px solid #333; }
-  table > caption + thead > tr:first-child > th,
-  table > caption + thead > tr:first-child > td,
-  table > colgroup + thead > tr:first-child > th,
-  table > colgroup + thead > tr:first-child > td,
-  table > thead:first-child > tr:first-child > th,
-  table > thead:first-child > tr:first-child > td {
-    border-top: 0; }
-  table > tbody + tbody {
-    border-top: 2px solid #333; }
-
 .site {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
   flex-direction: column;
   min-height: 100vh; }
 
 .site-wrap {
-  flex: 1; }
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1 0 auto;
+  flex: 1 0 auto; }
 
 footer {
   background-color: black;
@@ -951,6 +997,10 @@ footer {
   font-weight: 300;
   padding: 2rem;
   text-align: center; }
+
+.social-icons-left, .social-icons-right {
+  text-align: center;
+  float: none; }
 
 .social-icons {
   font-size: 1.25rem;
@@ -1049,13 +1099,23 @@ blockquote footer {
 
   blockquote {
     margin-left: 2rem;
-    padding: 2rem; } }
+    padding: 2rem; }
+
+  .social-icons-left {
+    text-align: left; }
+
+  .social-icons-right {
+    text-align: right; } }
 @media screen and (min-width: 48em) {
   html {
     font-size: 18px; } }
 @media screen and (min-width: 64em) {
   html {
     font-size: 20px; } }
+@media screen and (min-width: 78em) {
+  em img {
+    max-width: 56rem;
+    margin-left: -7em; } }
 .gist,
 .gist .highlight .p {
   font-size: .75rem; }
@@ -1132,13 +1192,14 @@ p a:hover, footer a:hover, li a:hover {
 p pre,
 p code,
 p samp {
+  background-color: transparent;
   color: black;
-  font-size: 0.84rem; }
+  font-size: 1rem; }
 
 pre,
 code,
 samp {
-  font-size: 0.68rem; }
+  font-size: 0.84rem; }
 
 .highlight .p {
-  font-size: 0.68rem; }
+  font-size: 0.84rem; }
